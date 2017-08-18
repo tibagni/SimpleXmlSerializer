@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/SimpleXmlSerializer.iml" filepath="$PROJECT_DIR$/SimpleXmlSerializer.iml" />
+      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/com.tiagobagni.xmlserializerlib/com.tiagobagni.xmlserializerlib.iml" filepath="$PROJECT_DIR$/com.tiagobagni.xmlserializerlib/com.tiagobagni.xmlserializerlib.iml" />
+    </modules>
+  </component>
+</project>
