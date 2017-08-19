@@ -1,5 +1,6 @@
 package com.tiagobagni.simplexmlserializerlib.xml;
 
+import com.tiagobagni.simplexmlserializerlib.XmlSerializerLogger;
 import com.tiagobagni.simplexmlserializerlib.xml.annotation.XmlClass;
 import com.tiagobagni.simplexmlserializerlib.xml.annotation.XmlField;
 import com.tiagobagni.simplexmlserializerlib.xml.annotation.XmlObject;
@@ -28,6 +29,14 @@ public class XmlSerializer {
     private Object xmlObject;
     private String xmlRootTag;
     private XmlSerializer nestedSerializer;
+
+    private final boolean DBG;
+    private final XmlSerializerLogger LOGGER;
+
+    public XmlSerializer() {
+        DBG = SimpleXmlParams.get().isDebugMode();
+        LOGGER = SimpleXmlParams.get().getLogger();
+    }
 
     /**
      * Serializes a Java object into its XML representation.
@@ -66,6 +75,8 @@ public class XmlSerializer {
     private void writeXmlHeader() {
         xmlBuilder.append(XML_HEADER);
         xmlBuilder.append(NEW_LINE);
+
+        if (DBG) LOGGER.debug("writing xml header");
     }
 
     private void writeXmlBody(StringBuilder xmlBuilder, int indentLevels)
@@ -88,6 +99,7 @@ public class XmlSerializer {
     }
 
     private void writeOpenTag() {
+        if (DBG) LOGGER.debug("writing open tag: " + xmlRootTag);
         xmlBuilder.append(spacing);
         xmlBuilder.append(open(xmlRootTag));
         xmlBuilder.append(NEW_LINE);
@@ -115,6 +127,7 @@ public class XmlSerializer {
     }
 
     private void writeXmlField(String tag, Object value) {
+        if (DBG) LOGGER.debug("writing primitive: " + tag + " = " + value);
         xmlBuilder.append(nestedSpacing);
         xmlBuilder.append(open(tag));
         xmlBuilder.append(value);
@@ -122,6 +135,7 @@ public class XmlSerializer {
     }
 
     private void writeXmlObject(String tag, Object value) throws IllegalAccessException {
+        if (DBG) LOGGER.debug("writing object: " + tag + " = " + value);
         if (nestedSerializer == null) {
             nestedSerializer = new XmlSerializer();
         }
@@ -133,6 +147,7 @@ public class XmlSerializer {
     }
 
     private void writeXmlList(String tag, List items) throws IllegalAccessException {
+        if (DBG) LOGGER.debug("writing list: " + tag);
         xmlBuilder.append(nestedSpacing);
         xmlBuilder.append(open(tag));
         xmlBuilder.append(NEW_LINE);
@@ -150,6 +165,7 @@ public class XmlSerializer {
     }
 
     private void writeCloseTag() {
+        if (DBG) LOGGER.debug("writing close tag: " + xmlRootTag);
         xmlBuilder.append(spacing);
         xmlBuilder.append(close(xmlRootTag));
     }

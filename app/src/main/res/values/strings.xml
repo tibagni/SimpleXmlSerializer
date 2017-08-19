@@ -3,4 +3,5 @@
     <string name="btn_serialize">Serialize</string>
     <string name="btn_deserialize">Deserialize</string>
     <string name="btn_clean">Clean</string>
+    <string name="btn_show_logs">Show Logs</string>
 </resources>
