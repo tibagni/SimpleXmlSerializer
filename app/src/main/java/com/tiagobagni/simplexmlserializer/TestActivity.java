@@ -1,14 +1,13 @@
 package com.tiagobagni.simplexmlserializer;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.widget.Button;
 import android.widget.EditText;
 
 import com.tiagobagni.simplexmlserializer.sampleobjects.Product;
 import com.tiagobagni.simplexmlserializer.sampleobjects.ShoppingCart;
 import com.tiagobagni.simplexmlserializer.sampleobjects.ShoppingCartItem;
-import com.tiagobagni.simplexmlserializerlib.xml.XmlDeserializationException;
 import com.tiagobagni.simplexmlserializerlib.xml.XmlDeserializer;
 import com.tiagobagni.simplexmlserializerlib.xml.XmlSerializer;
 
@@ -58,7 +57,7 @@ public class TestActivity extends AppCompatActivity {
         XmlSerializer serializer = new XmlSerializer();
         String output;
         try {
-            output = serializer.serialize(items.get(0));
+            output = serializer.serialize(shoppingCart);
         } catch (Exception e) {
             output = "Failed to Serialize object: " + e;
         }
@@ -68,7 +67,7 @@ public class TestActivity extends AppCompatActivity {
 
     private void deserialize() {
         String xml = outputText.getText().toString();
-        XmlDeserializer deserializer = new XmlDeserializer(ShoppingCartItem.class);
+        XmlDeserializer deserializer = new XmlDeserializer(ShoppingCart.class);
         String output;
         try {
             Object object = deserializer.deserialize(xml);
@@ -79,4 +78,5 @@ public class TestActivity extends AppCompatActivity {
 
         outputText.setText(output);
     }
+
 }

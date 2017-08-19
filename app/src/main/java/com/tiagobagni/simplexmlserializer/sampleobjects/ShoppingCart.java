@@ -32,4 +32,12 @@ public class ShoppingCart {
     public void setName(String name) {
         this.name = name;
     }
+
+    @Override
+    public String toString() {
+        return "ShoppingCart{" +
+                "items=" + items +
+                ", name='" + name + '\'' +
+                '}';
+    }
 }

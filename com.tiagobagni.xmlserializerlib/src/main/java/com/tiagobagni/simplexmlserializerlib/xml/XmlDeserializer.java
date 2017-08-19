@@ -17,7 +17,11 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Stack;
 
 /**
@@ -36,6 +40,12 @@ public class XmlDeserializer {
     private Stack<String> parsingTags;
 
     private String lastTagToParse;
+
+    private boolean isParsingList;
+    private String listTag;
+    private List listOfXmlObjects;
+    private Class listItemType;
+    private Field listField;
 
     public XmlDeserializer(Class xmlClass) {
         try {
@@ -137,6 +147,9 @@ public class XmlDeserializer {
                     case XmlPullParser.END_TAG:
                         Log.d("debug", "end tag: " + xmlPullParser.getName());
                         String closedTag = parsingTags.pop();
+                        if (isParsingList && closedTag.equals(listTag)) {
+                            finishParseXmlObjectList();
+                        }
                         if (shouldAbortParsing(closedTag)) {
                             // End early. This happens if we are parsing a nested object.
                             return;
@@ -150,26 +163,46 @@ public class XmlDeserializer {
         }
     }
 
+    private void finishParseXmlObjectList() {
+        // We finished parsing the list. Save it and cleanup!
+        setField(listField, listOfXmlObjects);
+
+        isParsingList = false;
+        listTag = null;
+        listItemType = null;
+        listOfXmlObjects = null;
+        listField = null;
+    }
+
     private void handleText() throws XmlDeserializationException {
         String currentTag = parsingTags.peek();
         String value = xmlPullParser.getText();
         FieldWrapper fieldWrapper = xmlPropertiesMap.get(currentTag);
         if (fieldWrapper == null) {
-            // Nothing to do here. We can fall here if there is an unexpected tag. That's fine,
-            // probably because it is not relevant to the problem, so it was not declared in the
-            // xml object.
+            if (isParsingList) {
+                parseXmlObjectListItem();
+            }
+
+            // Basically there are two cases in which fieldWrapper can be null:
+            //   1 - The xml tag doesn't have a corresponding java field (That's ok.
+            //       The xml can be more complex than the actual Java object)
+            //   2 - We are parsing a list. In this case, we need to parse the objects
+            //       and add to the list
+            // Case (2) was handled above, and case (1) we can just ignore the tag.
+            // So, just return here
             return;
         }
 
-        Annotation fieldAnnotation = fieldWrapper.annotation;
+        Annotation fieldAnnotation = fieldWrapper == null ? null : fieldWrapper.annotation;
         if (fieldAnnotation instanceof XmlField) {
             parsePrimitiveValue(fieldWrapper.field, value);
         } else if (fieldAnnotation instanceof XmlObject) {
             parseXmlObject(fieldWrapper.field);
         } else if (fieldAnnotation instanceof XmlObjectList) {
-
-        } else {
-            // Something went terribly wrong here...
+            if (!isParsingList) {
+                // If we are already parsing the list, don't start it again
+                startParseXmlObjectList(fieldWrapper.field);
+            }
         }
     }
 
@@ -203,13 +236,53 @@ public class XmlDeserializer {
 
     private void parseXmlObject(Field field) throws XmlDeserializationException {
         Log.d("debug", "XmlObjectFound");
-        XmlDeserializer nestedDeserializer = new XmlDeserializer(field.getType());
+        setField(field, deserializeObject(field.getType()));
+    }
+
+    private Object deserializeObject(Class type) throws XmlDeserializationException {
+        XmlDeserializer nestedDeserializer = new XmlDeserializer(type);
         nestedDeserializer.lastTagToParse = parsingTags.peek(); // Only parse this object
         nestedDeserializer.xmlPullParser = xmlPullParser;
         nestedDeserializer.parsingTags = parsingTags;
 
         nestedDeserializer.parse();
-        setField(field, nestedDeserializer.xmlObject);
+        return nestedDeserializer.xmlObject;
+    }
+
+    private void startParseXmlObjectList(Field field) {
+        if (field.getType() != List.class) {
+            throw new IllegalStateException("A List was expected for " + field.getName());
+        }
+
+        if (isParsingList) {
+            throw new IllegalStateException("Trying to start parsing a list while parsing a list");
+        }
+
+        isParsingList = true;
+        listOfXmlObjects = new ArrayList();
+        listTag = parsingTags.peek();
+        listField = field;
+
+        // Find out the type of the list items
+        Type type = field.getGenericType();
+        if (type instanceof ParameterizedType) {
+            ParameterizedType pType = (ParameterizedType) type;
+            Type[] arr = pType.getActualTypeArguments();
+            if (arr != null && arr.length == 1) {
+                listItemType = (Class) arr[0];
+            }
+        }
+
+        if (listItemType == null) {
+            throw new IllegalStateException("Not possible to read generic type of "
+                    + field.getName());
+        }
+    }
+
+    private void parseXmlObjectListItem() throws XmlDeserializationException {
+        Log.d("debug", "XmlObjectListItem found");
+        listOfXmlObjects.add(deserializeObject(listItemType));
+        Log.d("debug", "added list item");
     }
 
     private void setField(Field field, Object value) {
