@@ -1,7 +1,7 @@
 package com.tiagobagni.simplexmlserializer.sampleobjects;
 
+import com.tiagobagni.simplexmlserializerlib.xml.annotation.XmlClass;
 import com.tiagobagni.simplexmlserializerlib.xml.annotation.XmlField;
-import com.tiagobagni.simplexmlserializerlib.xml.annotation.XmlObject;
 import com.tiagobagni.simplexmlserializerlib.xml.annotation.XmlObjectList;
 
 import java.util.List;
@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * Created by tiagobagni on 18/08/17.
  */
-@XmlObject
+@XmlClass
 public class ShoppingCart {
     @XmlObjectList("Items")
     private List<ShoppingCartItem> items;

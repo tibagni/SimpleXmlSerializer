@@ -6,7 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Indicates a certain field from a class should be serialized into xml. It should
+ * Indicates a certain primitive field from a class should be serialized into xml. It should
  * only be used to annotate primitive types such as int, long, double, float,
  * boolean or String.
  *

@@ -1,5 +1,6 @@
 package com.tiagobagni.simplexmlserializerlib.xml;
 
+import com.tiagobagni.simplexmlserializerlib.xml.annotation.XmlClass;
 import com.tiagobagni.simplexmlserializerlib.xml.annotation.XmlField;
 import com.tiagobagni.simplexmlserializerlib.xml.annotation.XmlObject;
 import com.tiagobagni.simplexmlserializerlib.xml.annotation.XmlObjectList;
@@ -56,9 +57,9 @@ public class XmlSerializer {
             throw new NullPointerException("Trying to serialize a null object");
         }
 
-        Annotation annotation = xmlObject.getClass().getAnnotation(XmlObject.class);
+        Annotation annotation = xmlObject.getClass().getAnnotation(XmlClass.class);
         if (annotation == null) {
-            throw new IllegalArgumentException("Invalid XmlObject. Missing Xml annotation");
+            throw new IllegalArgumentException("Invalid XmlClass. Missing Xml annotation");
         }
     }
 
@@ -102,7 +103,7 @@ public class XmlSerializer {
             if (annotation instanceof XmlField) {
                 writeXmlField(((XmlField) annotation).value(), value);
             } else if (annotation instanceof XmlObject) {
-                writeXmlObject(value);
+                writeXmlObject(((XmlObject) annotation).value(), value);
             } else if (annotation instanceof XmlObjectList) {
                 writeXmlList(((XmlObjectList) annotation).value(), (List) value);
             } else {
@@ -120,12 +121,14 @@ public class XmlSerializer {
         xmlBuilder.append(close(tag));
     }
 
-    private void writeXmlObject(Object value) throws IllegalAccessException {
+    private void writeXmlObject(String tag, Object value) throws IllegalAccessException {
         if (nestedSerializer == null) {
             nestedSerializer = new XmlSerializer();
         }
 
         nestedSerializer.initializeFor(value);
+        // Use the defined Tag instead of the Class name for nested objects
+        nestedSerializer.xmlRootTag = tag;
         nestedSerializer.writeXmlBody(xmlBuilder, indentLevels + 1);
     }
 
@@ -136,7 +139,8 @@ public class XmlSerializer {
 
         indentLevels++; // Indent one more level for list items
         for (Object item : items) {
-            writeXmlObject(item);
+            // For objects in a List, use the class name as tag
+            writeXmlObject(item.getClass().getSimpleName(), item);
             xmlBuilder.append(NEW_LINE);
         }
         indentLevels--; // After the list was written, restore indentation

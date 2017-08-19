@@ -6,16 +6,13 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Indicates a certain object should be serialized into xml.
- * Check {@link XmlField} if you want to annotate primitive
- * types and String
- *
- * This Annotation should also be used for Xml Serializable
- * classes.
+ * Indicates a certain object field should be serialized into xml. Check {@link XmlField}
+ * if you want to annotate primitive types and String
  *
  * @author  Tiago Bagni
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.FIELD, ElementType.TYPE})
+@Target({ElementType.FIELD})
 public @interface XmlObject {
+    String value();
 }

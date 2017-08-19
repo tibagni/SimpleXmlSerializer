@@ -6,13 +6,12 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Indicates a {@link java.util.List} of objects should be serialized into xml. Elements of the
- * list must be from a type annotated with {@link XmlObject}
+ * Indicates a certain class can be serialized into xml.
+ * This Annotation should be used for Classes only.
  *
  * @author  Tiago Bagni
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.FIELD})
-public @interface XmlObjectList {
-    String value();
+@Target({ElementType.TYPE})
+public @interface XmlClass {
 }

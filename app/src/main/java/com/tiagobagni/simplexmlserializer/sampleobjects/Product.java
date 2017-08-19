@@ -1,12 +1,12 @@
 package com.tiagobagni.simplexmlserializer.sampleobjects;
 
+import com.tiagobagni.simplexmlserializerlib.xml.annotation.XmlClass;
 import com.tiagobagni.simplexmlserializerlib.xml.annotation.XmlField;
-import com.tiagobagni.simplexmlserializerlib.xml.annotation.XmlObject;
 
 /**
  * Created by tiagobagni on 18/08/17.
  */
-@XmlObject
+@XmlClass
 public class Product {
     @XmlField("Name")
     private String name;
