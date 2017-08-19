@@ -7,3 +7,6 @@
 /build
 /captures
 .externalNativeBuild
+
+private_key_sender.asc
+public_key_sender.asc

@@ -1,1 +1,1 @@
-include ':app', ':com.tiagobagni.xmlserializerlib'
+include ':app', ':simple-xml-serializer'

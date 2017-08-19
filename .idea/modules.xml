@@ -4,7 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/SimpleXmlSerializer.iml" filepath="$PROJECT_DIR$/SimpleXmlSerializer.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/com.tiagobagni.xmlserializerlib/com.tiagobagni.xmlserializerlib.iml" filepath="$PROJECT_DIR$/com.tiagobagni.xmlserializerlib/com.tiagobagni.xmlserializerlib.iml" />
+      <module fileurl="file://$PROJECT_DIR$/simple-xml-serializer/com.tiagobagni.xmlserializerlib.iml" filepath="$PROJECT_DIR$/simple-xml-serializer/com.tiagobagni.xmlserializerlib.iml" />
     </modules>
   </component>
 </project>

@@ -1,0 +1,51 @@
+apply plugin: 'com.android.library'
+
+ext {
+    bintrayRepo = 'SimpleXmlSerializer'
+    bintrayName = 'simple-xml-serializer'
+
+    publishedGroupId = 'com.github.tibagni'
+    libraryName = 'SimpleXmlSerializer'
+    artifact = 'simple-xml-serializer'
+
+    libraryDescription = 'A simple Android tool to help create XML from Java objects and also read XML Strings and convert into java objects.'
+
+    siteUrl = 'https://github.com/tibagni/SimpleXmlSerializer'
+    gitUrl = 'https://github.com/tibagni/SimpleXmlSerializer.git'
+
+    libraryVersion = '0.1.1'
+
+    developerId = 'tibagni'
+    developerName = 'Tiago Viscardi Bagni'
+    developerEmail = 'tibagni@gmail.com'
+
+    licenseName = 'The Apache Software License, Version 2.0'
+    licenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+    allLicenses = ["Apache-2.0"]
+}
+
+android {
+    compileSdkVersion 25
+    buildToolsVersion "25.0.2"
+
+
+    defaultConfig {
+        minSdkVersion 19
+        targetSdkVersion 25
+        versionCode 1
+        versionName "0.1.1"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+}
+
+apply from: '../installv1.gradle'
+apply from: '../bintrayv1.gradle'

@@ -9,7 +9,7 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/app" />
-            <option value="$PROJECT_DIR$/com.tiagobagni.xmlserializerlib" />
+            <option value="$PROJECT_DIR$/simple-xml-serializer" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />
