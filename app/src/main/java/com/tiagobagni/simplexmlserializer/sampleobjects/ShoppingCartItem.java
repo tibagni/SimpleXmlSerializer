@@ -20,6 +20,10 @@ public class ShoppingCartItem {
         this.quantity = quantity;
     }
 
+    public ShoppingCartItem() {
+        // A constructor with no arguments is required by deserialization lib
+    }
+
     public Product getProduct() {
         return product;
     }
@@ -34,5 +38,13 @@ public class ShoppingCartItem {
 
     public void setQuantity(int quantity) {
         this.quantity = quantity;
+    }
+
+    @Override
+    public String toString() {
+        return "ShoppingCartItem{" +
+                "product=" + product +
+                ", quantity=" + quantity +
+                '}';
     }
 }

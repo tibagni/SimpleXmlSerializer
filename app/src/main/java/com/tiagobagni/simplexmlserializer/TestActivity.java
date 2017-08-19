@@ -8,6 +8,8 @@ import android.widget.EditText;
 import com.tiagobagni.simplexmlserializer.sampleobjects.Product;
 import com.tiagobagni.simplexmlserializer.sampleobjects.ShoppingCart;
 import com.tiagobagni.simplexmlserializer.sampleobjects.ShoppingCartItem;
+import com.tiagobagni.simplexmlserializerlib.xml.XmlDeserializationException;
+import com.tiagobagni.simplexmlserializerlib.xml.XmlDeserializer;
 import com.tiagobagni.simplexmlserializerlib.xml.XmlSerializer;
 
 import java.util.ArrayList;
@@ -16,6 +18,8 @@ import java.util.List;
 public class TestActivity extends AppCompatActivity {
 
     private Button serializeButton;
+    private Button deserializeButton;
+    private Button cleanButton;
     private EditText outputText;
 
     @Override
@@ -24,8 +28,13 @@ public class TestActivity extends AppCompatActivity {
         setContentView(R.layout.activity_test);
 
         serializeButton = findViewById(R.id.serialize_btn);
+        deserializeButton = findViewById(R.id.deserialize_btn);
+        cleanButton = findViewById(R.id.clean_btn);
         outputText = findViewById(R.id.output_text);
+
         serializeButton.setOnClickListener(v -> serialize());
+        deserializeButton.setOnClickListener(v -> deserialize());
+        cleanButton.setOnClickListener(v -> outputText.setText(""));
     }
 
     private void serialize() {
@@ -49,9 +58,23 @@ public class TestActivity extends AppCompatActivity {
         XmlSerializer serializer = new XmlSerializer();
         String output;
         try {
-            output = serializer.serialize(shoppingCart);
+            output = serializer.serialize(items.get(0));
         } catch (Exception e) {
             output = "Failed to Serialize object: " + e;
+        }
+
+        outputText.setText(output);
+    }
+
+    private void deserialize() {
+        String xml = outputText.getText().toString();
+        XmlDeserializer deserializer = new XmlDeserializer(ShoppingCartItem.class);
+        String output;
+        try {
+            Object object = deserializer.deserialize(xml);
+            output = object.toString();
+        } catch (Exception e) {
+            output = "Failed to De-serialize object: " + e;
         }
 
         outputText.setText(output);

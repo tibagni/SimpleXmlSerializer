@@ -11,7 +11,7 @@ import java.util.List;
 
 /**
  * Utility class responsible for serializing an object annotated with
- * {@link XmlObject} into xml.
+ * {@link XmlClass} into xml.
  *
  * @author  Tiago Bagni
  */
