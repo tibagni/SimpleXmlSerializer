@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">SimpleXmlSerializer</string>
+    <string name="btn_serialize">Serialize Object</string>
 </resources>
