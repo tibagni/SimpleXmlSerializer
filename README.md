@@ -47,7 +47,7 @@ private String toXml(Product product) throws IllegalAccessException {
 ### Deserializing an Object
 To convert an XML String into a Java Object, it is just as simple. Below code will convert the following xml:
 ```xml
-<?xml version=\"1.0\"?>
+<?xml version="1.0"?>
 <Product>
   <Description>Product Description</Description>
   <Name>Product Name</Name>
