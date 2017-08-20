@@ -1,6 +1,13 @@
 # SimpleXmlSerializer
 A simple Android tool to help create XML from Java objects and also read XML Strings and convert into java objects.
-
+## Download
+Add the dependency in Gradle:
+```gradle
+dependencies {
+    compile 'com.github.tibagni:simple-xml-serializer:0.1.1'
+}
+```
+Package is available in *jcenter*
 ## Usage
 *SimpleXmlSerializer* is a very simple and easy-to-use tool.
 ### Serializing an existing Java Object
