@@ -57,7 +57,7 @@ To convert an XML String into a Java Object, it is just as simple. Below code wi
 into an instance of *Product* (as defined above). Just run the following code:
 ```java
 private Product fromXml(String xml) throws XmlDeserializationException {
-    XmlDeserializer deserializer = new XmlDeserializer(ShoppingCart.class);;
+    XmlDeserializer deserializer = new XmlDeserializer(Product.class);
     return (Product) deserializer.deserialize(xml);
 }
 ```
