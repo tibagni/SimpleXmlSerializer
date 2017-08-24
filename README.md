@@ -122,3 +122,28 @@ Used at field level. This annotation is used to tell a certain field is part of 
 @XmlObjectList("xmlTag")
 ```
 Used at field level. This annotation is used to tell a list is part of the Xml content. Only `java.util.List`
+```java 
+@XmlObjects("xmlTag")
+```
+Used at field level. This annotation is used to tell a list is part of the Xml content. Only `java.util.List`
+The difference between `@XmlObjects` and `@XmlObjectList` is that `@XmlObjectList` has a tag for the list. See example below:
+
+@XmlObjects:
+```xml 
+<xml>
+    <item>...</item>
+    <item>...</item>
+    <item>...</item>
+</xml>
+```
+
+@XmlObjectList:
+```xml 
+<xml>
+    <xmlList>
+        <item>...</item>
+        <item>...</item>
+        <item>...</item>
+    </xmlList>
+</xml>
+```
