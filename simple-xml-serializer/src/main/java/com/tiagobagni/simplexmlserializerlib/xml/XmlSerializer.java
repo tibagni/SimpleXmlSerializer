@@ -9,7 +9,10 @@ import com.tiagobagni.simplexmlserializerlib.xml.annotation.XmlObjects;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Utility class responsible for serializing an object annotated with
@@ -107,7 +110,7 @@ public class XmlSerializer {
     }
 
     private void writeFields() throws IllegalAccessException {
-        Field[] fields = xmlObject.getClass().getDeclaredFields();
+        Field[] fields = getOrderedFields();
         for (Field field : fields) {
             Annotation annotation = getAnnotation(field);
             field.setAccessible(true);
@@ -127,6 +130,21 @@ public class XmlSerializer {
             }
             xmlBuilder.append(NEW_LINE);
         }
+    }
+
+    private Field[] getOrderedFields() {
+        Field[] fields = xmlObject.getClass().getDeclaredFields();
+        Arrays.sort(fields, (first, second) -> {
+            Annotation annotation1 = getAnnotation(first);
+            Annotation annotation2 = getAnnotation(second);
+
+            // XmlField has higher priority
+            if (annotation1 instanceof XmlField) return -1;
+            if (annotation2 instanceof XmlField) return 1;
+            return 0;
+        });
+
+        return fields;
     }
 
     private void writeXmlField(String tag, Object value) {
