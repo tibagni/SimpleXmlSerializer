@@ -7,6 +7,7 @@ import com.tiagobagni.simplexmlserializerlib.xml.annotation.XmlClass;
 import com.tiagobagni.simplexmlserializerlib.xml.annotation.XmlField;
 import com.tiagobagni.simplexmlserializerlib.xml.annotation.XmlObject;
 import com.tiagobagni.simplexmlserializerlib.xml.annotation.XmlObjectList;
+import com.tiagobagni.simplexmlserializerlib.xml.annotation.XmlObjects;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
@@ -90,7 +91,8 @@ public class XmlDeserializer {
         for (Annotation annotation : annotations) {
             if (annotation instanceof XmlField ||
                     annotation instanceof XmlObject ||
-                    annotation instanceof XmlObjectList) {
+                    annotation instanceof XmlObjectList ||
+                    annotation instanceof XmlObjects) {
                 return annotation;
             }
         }
@@ -112,6 +114,11 @@ public class XmlDeserializer {
         annotation = field.getAnnotation(XmlObjectList.class);
         if (annotation != null) {
             return ((XmlObjectList) annotation).value();
+        }
+
+        annotation = field.getAnnotation(XmlObjects.class);
+        if (annotation != null) {
+            return ((XmlObjects) annotation).value();
         }
 
         throw new IllegalStateException("Called getTagFor on a field without annotation " + field);
@@ -220,6 +227,8 @@ public class XmlDeserializer {
                 // If we are already parsing the list, don't start it again
                 startParseXmlObjectList(fieldWrapper.field);
             }
+        } else if (fieldAnnotation instanceof XmlObjects) {
+            parseXmlMultipleObjects(fieldWrapper.field);
         }
     }
 
@@ -282,21 +291,7 @@ public class XmlDeserializer {
         listOfXmlObjects = new ArrayList();
         listTag = parsingTags.peek();
         listField = field;
-
-        // Find out the type of the list items
-        Type type = field.getGenericType();
-        if (type instanceof ParameterizedType) {
-            ParameterizedType pType = (ParameterizedType) type;
-            Type[] arr = pType.getActualTypeArguments();
-            if (arr != null && arr.length == 1) {
-                listItemType = (Class) arr[0];
-            }
-        }
-
-        if (listItemType == null) {
-            throw new IllegalStateException("Not possible to read generic type of "
-                    + field.getName());
-        }
+        listItemType = getGenericTypeOf(field);
 
         if (DBG) LOGGER.debug("Started parsing list: " + listTag);
     }
@@ -305,6 +300,26 @@ public class XmlDeserializer {
         Object object = deserializeObject(listItemType);
         listOfXmlObjects.add(object);
         if (DBG) LOGGER.debug("Object added to list: " + listItemType + " = " + object);
+    }
+
+    private void parseXmlMultipleObjects(Field field) throws XmlDeserializationException {
+        Class type = field.getType();
+        if (type != List.class) {
+            throw new IllegalStateException("XmlObjects annotation should only be used on Lists");
+        }
+
+        List currentList = (List) getField(field);
+        if (currentList == null) {
+            // If this is the first element. Instantiate a list and set to the field
+            currentList = new ArrayList();
+            setField(field, currentList);
+        }
+
+        Class itemType = getGenericTypeOf(field);
+        Object object = deserializeObject(itemType);
+        currentList.add(object);
+
+        if (DBG) LOGGER.debug("Object added to objects: " + type + " = " + object);
     }
 
     private void setField(Field field, Object value) {
@@ -319,8 +334,42 @@ public class XmlDeserializer {
         }
     }
 
+    private Object getField(Field field) {
+        Object object = null;
+        try {
+            field.setAccessible(true);
+            object = field.get(xmlObject);
+        } catch (IllegalAccessException e) {
+            // This should not happen, but if we fail to get the value to the field for some reason,
+            // just return null
+            if (DBG) LOGGER.error("An error occurred while trying to get " +
+                    "value from field " + field.getName(), e);
+        }
+
+        return object;
+    }
+
     private boolean shouldAbortParsing(String tag) {
         return lastTagToParse != null && lastTagToParse.equals(tag);
+    }
+
+    private Class getGenericTypeOf(Field field) {
+        Class genericType = null;
+        Type type = field.getGenericType();
+        if (type instanceof ParameterizedType) {
+            ParameterizedType pType = (ParameterizedType) type;
+            Type[] arr = pType.getActualTypeArguments();
+            if (arr != null && arr.length == 1) {
+                genericType = (Class) arr[0];
+            }
+        }
+
+        if (genericType == null) {
+            throw new IllegalArgumentException("Not possible to read generic type of "
+                    + field.getName());
+        }
+
+        return genericType;
     }
 
     private class FieldWrapper  {
