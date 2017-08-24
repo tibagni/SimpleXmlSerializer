@@ -60,7 +60,7 @@ public class XmlSerializer {
     private void initializeFor(Object xmlObject) {
         ensureValid(xmlObject);
         this.xmlObject = xmlObject;
-        this.xmlRootTag = xmlObject.getClass().getSimpleName();
+        this.xmlRootTag = ReflectionUtils.getClassTag(xmlObject);
         this.xmlBuilder = new StringBuilder();
         this.nestedSerializer = null;
     }
@@ -116,14 +116,15 @@ public class XmlSerializer {
             field.setAccessible(true);
             Object value = field.get(xmlObject);
 
+            String tag = ReflectionUtils.getFieldTag(field, annotation);
             if (annotation instanceof XmlField) {
-                writeXmlField(((XmlField) annotation).value(), value);
+                writeXmlField(tag, value);
             } else if (annotation instanceof XmlObject) {
-                writeXmlObject(((XmlObject) annotation).value(), value);
+                writeXmlObject(tag, value);
             } else if (annotation instanceof XmlObjectList) {
-                writeXmlList(((XmlObjectList) annotation).value(), (List) value);
+                writeXmlList(tag, (List) value);
             } else if (annotation instanceof XmlObjects) {
-                writeMultipleItems(((XmlObjects) annotation).value(), (List) value);
+                writeMultipleItems(tag, (List) value);
             } else {
                 // Do not append a new line if no xml was written on this iteration
                 continue;
