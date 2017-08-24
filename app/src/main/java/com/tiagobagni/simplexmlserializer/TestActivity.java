@@ -131,7 +131,7 @@ public class TestActivity extends AppCompatActivity {
 
     private void initializeObjectToSerialize() {
         // Change object here to serialize/deserialize a different object
-        objectToSerialize = getRss();
+        objectToSerialize = getShoppingCart();
     }
 
 

@@ -79,49 +79,12 @@ public class XmlDeserializer {
     private void readClassMembers() {
         Field[] fields = xmlClass.getDeclaredFields();
         for (Field field : fields) {
-            Annotation fieldAnnotation = getFieldAnnotation(field);
+            Annotation fieldAnnotation = ReflectionUtils.getFieldAnnotation(field);
             if (fieldAnnotation != null) {
-                xmlPropertiesMap.put(getTagFor(field), new FieldWrapper(field, fieldAnnotation));
+                xmlPropertiesMap.put(ReflectionUtils.getFieldTag(field),
+                        new FieldWrapper(field, fieldAnnotation));
             }
         }
-    }
-
-    private Annotation getFieldAnnotation(Field field) {
-        Annotation[] annotations = field.getAnnotations();
-        for (Annotation annotation : annotations) {
-            if (annotation instanceof XmlField ||
-                    annotation instanceof XmlObject ||
-                    annotation instanceof XmlObjectList ||
-                    annotation instanceof XmlObjects) {
-                return annotation;
-            }
-        }
-
-        return null;
-    }
-
-    private String getTagFor(Field field) {
-        Annotation annotation = field.getAnnotation(XmlField.class);
-        if (annotation != null) {
-            return ((XmlField) annotation).value();
-        }
-
-        annotation = field.getAnnotation(XmlObject.class);
-        if (annotation != null) {
-            return ((XmlObject) annotation).value();
-        }
-
-        annotation = field.getAnnotation(XmlObjectList.class);
-        if (annotation != null) {
-            return ((XmlObjectList) annotation).value();
-        }
-
-        annotation = field.getAnnotation(XmlObjects.class);
-        if (annotation != null) {
-            return ((XmlObjects) annotation).value();
-        }
-
-        throw new IllegalStateException("Called getTagFor on a field without annotation " + field);
     }
 
     public Object deserialize(String xml) throws XmlDeserializationException {

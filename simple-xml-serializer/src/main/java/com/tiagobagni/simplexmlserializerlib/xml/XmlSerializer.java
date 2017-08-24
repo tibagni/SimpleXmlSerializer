@@ -112,7 +112,7 @@ public class XmlSerializer {
     private void writeFields() throws IllegalAccessException {
         Field[] fields = getOrderedFields();
         for (Field field : fields) {
-            Annotation annotation = getAnnotation(field);
+            Annotation annotation = ReflectionUtils.getFieldAnnotation(field);
             field.setAccessible(true);
             Object value = field.get(xmlObject);
 
@@ -135,8 +135,8 @@ public class XmlSerializer {
     private Field[] getOrderedFields() {
         Field[] fields = xmlObject.getClass().getDeclaredFields();
         Arrays.sort(fields, (first, second) -> {
-            Annotation annotation1 = getAnnotation(first);
-            Annotation annotation2 = getAnnotation(second);
+            Annotation annotation1 = ReflectionUtils.getFieldAnnotation(first);
+            Annotation annotation2 = ReflectionUtils.getFieldAnnotation(second);
 
             // XmlField has higher priority
             if (annotation1 instanceof XmlField) return -1;
@@ -175,41 +175,27 @@ public class XmlSerializer {
 
         Class itemType = (items != null && items.size() > 0) ? items.get(0).getClass() : null;
         String itemTag = itemType != null ? itemType.getSimpleName() : "";
+
+        indentLevels++; // Indent one more level for list items
         writeMultipleItems(itemTag, items);
+        indentLevels--; // After the list was written, restore indentation
 
         xmlBuilder.append(nestedSpacing);
         xmlBuilder.append(close(tag));
     }
 
     private void writeMultipleItems(String tag, List items) throws IllegalAccessException {
-        indentLevels++; // Indent one more level for list items
         for (Object item : items) {
             // For objects in a List, use the class name as tag
             writeXmlObject(tag, item);
             xmlBuilder.append(NEW_LINE);
         }
-        indentLevels--; // After the list was written, restore indentation
     }
 
     private void writeCloseTag() {
         if (DBG) LOGGER.debug("writing close tag: " + xmlRootTag);
         xmlBuilder.append(spacing);
         xmlBuilder.append(close(xmlRootTag));
-    }
-
-    private Annotation getAnnotation(Field field) {
-        Annotation annotation = field.getAnnotation(XmlField.class);
-        if (annotation == null) {
-            annotation = field.getAnnotation(XmlObject.class);
-        }
-        if (annotation == null) {
-            annotation = field.getAnnotation(XmlObjectList.class);
-        }
-        if (annotation == null) {
-            annotation = field.getAnnotation(XmlObjects.class);
-        }
-
-        return annotation;
     }
 
     private String open(String tag) {
