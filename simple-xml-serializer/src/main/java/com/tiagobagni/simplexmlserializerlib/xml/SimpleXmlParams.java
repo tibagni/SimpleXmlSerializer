@@ -11,6 +11,7 @@ import com.tiagobagni.simplexmlserializerlib.XmlSerializerLogger;
 public class SimpleXmlParams {
     private XmlSerializerLogger logger;
     private boolean isDebugMode;
+    private boolean indentOutput = true;
 
     private static SimpleXmlParams instance;
 
@@ -49,5 +50,17 @@ public class SimpleXmlParams {
      */
     public void setDebugMode(boolean debugMode) {
         isDebugMode = debugMode;
+    }
+
+    boolean shouldIndentOutput() {
+        return indentOutput;
+    }
+
+    /**
+     * Enable/Disable indentation for output xml (enabled by default)
+     * @param indentOutput
+     */
+    public void indentOutput(boolean indentOutput) {
+        this.indentOutput = indentOutput;
     }
 }

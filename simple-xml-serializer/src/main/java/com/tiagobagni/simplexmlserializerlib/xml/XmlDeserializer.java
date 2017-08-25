@@ -1,7 +1,5 @@
 package com.tiagobagni.simplexmlserializerlib.xml;
 
-import android.text.TextUtils;
-
 import com.tiagobagni.simplexmlserializerlib.XmlSerializerLogger;
 import com.tiagobagni.simplexmlserializerlib.xml.annotation.XmlClass;
 import com.tiagobagni.simplexmlserializerlib.xml.annotation.XmlField;
@@ -52,8 +50,9 @@ public class XmlDeserializer {
     private final XmlSerializerLogger LOGGER;
 
     public XmlDeserializer(Class xmlClass) {
-        DBG = SimpleXmlParams.get().isDebugMode();
-        LOGGER = SimpleXmlParams.get().getLogger();
+        SimpleXmlParams params = SimpleXmlParams.get();
+        DBG = params.isDebugMode();
+        LOGGER = params.getLogger();
 
         try {
             ensureValid(xmlClass);
@@ -88,7 +87,9 @@ public class XmlDeserializer {
     }
 
     public Object deserialize(String xml) throws XmlDeserializationException {
-        initialize(new StringReader(xml));
+        // Always remove unnecessary blank lines an whitespaces
+        String inputXml = StringUtils.trim(xml);
+        initialize(new StringReader(inputXml));
         parse();
 
         return xmlObject;
@@ -113,28 +114,17 @@ public class XmlDeserializer {
             while (eventType != XmlPullParser.END_DOCUMENT) {
                 switch (eventType) {
                     case XmlPullParser.START_TAG:
-                        String openTag = xmlPullParser.getName();
-                        if (DBG) LOGGER.debug("Open tag: " + openTag);
-                        parsingTags.push(openTag);
+                        String startTag = xmlPullParser.getName();
+                        if (DBG) LOGGER.debug("Start tag: " + startTag);
+                        handleStartTag(startTag);
                         break;
                     case XmlPullParser.TEXT:
                         handleText();
                         break;
                     case XmlPullParser.END_TAG:
-                        String closedTag = parsingTags.pop();
                         String endTag = xmlPullParser.getName();
-                        if (!TextUtils.equals(closedTag, endTag) && DBG) {
-                            if (DBG) LOGGER.error("End tag is different from the" +
-                                    " top of the stack!" +
-                                    " EndTag = " + endTag +
-                                    " TopStack = " + closedTag);
-                        }
-
-                        if (DBG) LOGGER.debug("Close tag: " + closedTag);
-                        if (isParsingList && closedTag.equals(listTag)) {
-                            finishParseXmlObjectList();
-                        }
-                        if (shouldAbortParsing(closedTag)) {
+                        handleEndTag(endTag);
+                        if (shouldAbortParsing(endTag)) {
                             // End early. This happens if we are parsing a nested object.
                             if (DBG) LOGGER.debug("End Early. " +
                                     "Finished parsing nested object");
@@ -149,22 +139,9 @@ public class XmlDeserializer {
         }
     }
 
-    private void finishParseXmlObjectList() {
-        // We finished parsing the list. Save it and cleanup!
-        setField(listField, listOfXmlObjects);
-        if (DBG) LOGGER.debug("Finished parsing list: " + listTag);
-
-        isParsingList = false;
-        listTag = null;
-        listItemType = null;
-        listOfXmlObjects = null;
-        listField = null;
-    }
-
-    private void handleText() throws XmlDeserializationException {
-        String currentTag = parsingTags.peek();
-        String value = xmlPullParser.getText();
-        FieldWrapper fieldWrapper = xmlPropertiesMap.get(currentTag);
+    private void handleStartTag(String tag) throws XmlDeserializationException {
+        parsingTags.push(tag);
+        FieldWrapper fieldWrapper = xmlPropertiesMap.get(tag);
         if (fieldWrapper == null) {
             if (isParsingList) {
                 parseXmlObjectListItem();
@@ -181,9 +158,7 @@ public class XmlDeserializer {
         }
 
         Annotation fieldAnnotation = fieldWrapper == null ? null : fieldWrapper.annotation;
-        if (fieldAnnotation instanceof XmlField) {
-            parsePrimitiveValue(fieldWrapper.field, value);
-        } else if (fieldAnnotation instanceof XmlObject) {
+        if (fieldAnnotation instanceof XmlObject) {
             parseXmlObject(fieldWrapper.field);
         } else if (fieldAnnotation instanceof XmlObjectList) {
             if (!isParsingList) {
@@ -195,34 +170,6 @@ public class XmlDeserializer {
         }
     }
 
-    private void parsePrimitiveValue(Field field, String value) {
-        if (TextUtils.isEmpty(value)) {
-            // Nothing to do here. If the xml value is empty, don't try to parse it
-            return;
-        }
-        Class cls = field.getType();
-        Object parsedValue;
-
-        if (cls == int.class || cls == Integer.class) {
-            parsedValue = Integer.parseInt(value);
-        } else if (cls == long.class || cls == Long.class) {
-            parsedValue = Long.parseLong(value);
-        } else if (cls == double.class || cls == Double.class) {
-            parsedValue = Double.parseDouble(value);
-        } else if (cls == float.class || cls == Float.class) {
-            parsedValue = Float.parseFloat(value);
-        } else if (cls == boolean.class || cls == Boolean.class) {
-            parsedValue =  Boolean.parseBoolean(value);
-        } else if (cls == String.class) {
-            parsedValue = value;
-        } else {
-            throw new IllegalStateException("Trying to parse unsupported type: " + cls);
-        }
-
-        setField(field, parsedValue);
-        if (DBG) LOGGER.debug("Primitive value found: " + cls + " = " + parsedValue);
-    }
-
     private void parseXmlObject(Field field) throws XmlDeserializationException {
         Class type = field.getType();
         Object object = deserializeObject(type);
@@ -232,13 +179,20 @@ public class XmlDeserializer {
     }
 
     private Object deserializeObject(Class type) throws XmlDeserializationException {
-        XmlDeserializer nestedDeserializer = new XmlDeserializer(type);
-        nestedDeserializer.lastTagToParse = parsingTags.peek(); // Only parse this object
-        nestedDeserializer.xmlPullParser = xmlPullParser;
-        nestedDeserializer.parsingTags = parsingTags;
+        try {
+            XmlDeserializer nestedDeserializer = new XmlDeserializer(type);
+            nestedDeserializer.lastTagToParse = parsingTags.peek(); // Only parse this object
+            nestedDeserializer.xmlPullParser = xmlPullParser;
+            nestedDeserializer.parsingTags = parsingTags;
+            // Move to the next tag so nestedDeserializer can work on the right object
+            xmlPullParser.next();
 
-        nestedDeserializer.parse();
-        return nestedDeserializer.xmlObject;
+            nestedDeserializer.parse();
+            return nestedDeserializer.xmlObject;
+        } catch (XmlPullParserException | IOException e) {
+            throw new XmlDeserializationException("It was not possible to move to the " +
+                    "next Xml Tag", e);
+        }
     }
 
     private void startParseXmlObjectList(Field field) {
@@ -285,6 +239,82 @@ public class XmlDeserializer {
         if (DBG) LOGGER.debug("Object added to objects: " + type + " = " + object);
     }
 
+    private void handleText() throws XmlDeserializationException {
+        String currentTag = parsingTags.peek();
+        String value = xmlPullParser.getText();
+        FieldWrapper fieldWrapper = xmlPropertiesMap.get(currentTag);
+        if (fieldWrapper == null) {
+            // The xml tag doesn't have a corresponding java field (That's ok.
+            // The xml can be more complex than the actual Java object)
+            if (DBG) LOGGER.debug("Skipping tag: " + currentTag + " = " + value);
+            return;
+        }
+
+        Annotation fieldAnnotation = fieldWrapper == null ? null : fieldWrapper.annotation;
+        if (fieldAnnotation instanceof XmlField) {
+            parsePrimitiveValue(fieldWrapper.field, value);
+        }
+    }
+
+    private void parsePrimitiveValue(Field field, String value) {
+        if (StringUtils.isEmpty(value)) {
+            // Nothing to do here. If the xml value is empty, don't try to parse it
+            return;
+        }
+        Class cls = field.getType();
+        Object parsedValue;
+
+        if (cls == int.class || cls == Integer.class) {
+            parsedValue = Integer.parseInt(value);
+        } else if (cls == long.class || cls == Long.class) {
+            parsedValue = Long.parseLong(value);
+        } else if (cls == double.class || cls == Double.class) {
+            parsedValue = Double.parseDouble(value);
+        } else if (cls == float.class || cls == Float.class) {
+            parsedValue = Float.parseFloat(value);
+        } else if (cls == boolean.class || cls == Boolean.class) {
+            parsedValue =  Boolean.parseBoolean(value);
+        } else if (cls == String.class) {
+            parsedValue = value;
+        } else {
+            throw new IllegalStateException("Trying to parse unsupported type: " + cls);
+        }
+
+        setField(field, parsedValue);
+        if (DBG) LOGGER.debug("Primitive value found: " + cls + " = " + parsedValue);
+    }
+
+    private void handleEndTag(String endTag) {
+        String poppedTag = parsingTags.pop();
+        if (!StringUtils.equals(poppedTag, endTag)) {
+            throw new IllegalStateException("End tag is different from the" +
+                    " top of the stack!" +
+                    " EndTag = " + endTag +
+                    " TopStack = " + poppedTag);
+        }
+
+        if (DBG) LOGGER.debug("End tag: " + endTag);
+        if (isParsingList && endTag.equals(listTag)) {
+            finishParseXmlObjectList();
+        }
+    }
+
+    private void finishParseXmlObjectList() {
+        // We finished parsing the list. Save it and cleanup!
+        setField(listField, listOfXmlObjects);
+        if (DBG) LOGGER.debug("Finished parsing list: " + listTag);
+
+        isParsingList = false;
+        listTag = null;
+        listItemType = null;
+        listOfXmlObjects = null;
+        listField = null;
+    }
+
+    private boolean shouldAbortParsing(String tag) {
+        return lastTagToParse != null && lastTagToParse.equals(tag);
+    }
+
     private void setField(Field field, Object value) {
         try {
             field.setAccessible(true);
@@ -310,10 +340,6 @@ public class XmlDeserializer {
         }
 
         return object;
-    }
-
-    private boolean shouldAbortParsing(String tag) {
-        return lastTagToParse != null && lastTagToParse.equals(tag);
     }
 
     private Class getGenericTypeOf(Field field) {

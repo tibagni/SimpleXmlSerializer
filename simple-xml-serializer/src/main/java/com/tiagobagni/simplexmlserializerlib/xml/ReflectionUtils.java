@@ -28,11 +28,14 @@ class ReflectionUtils {
     }
 
     static String getFieldTag(Field field, Annotation annotation) {
+        // Unfortunately there is no polymorphism for Annotations, so, instead of
+        // Checking which instance of annotation we have every time, just use reflection
+        // to call a method we know is defined on the annotations
         try {
             Method value = annotation.getClass().getDeclaredMethod("value");
             value.setAccessible(true);
             String annotationValue = (String) value.invoke(annotation);
-            return isEmpty(annotationValue) ? field.getName() : annotationValue;
+            return StringUtils.isEmpty(annotationValue) ? field.getName() : annotationValue;
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
             throw new IllegalStateException("There was a problem while trying to " +
                     "read tag from " + field, e);
@@ -60,10 +63,6 @@ class ReflectionUtils {
         String annotationValue = classAnnotation.value();
         String className = object.getClass().getSimpleName();
 
-        return isEmpty(annotationValue) ? className : annotationValue;
-    }
-
-    private static boolean isEmpty(String s) {
-        return s == null || s.isEmpty();
+        return StringUtils.isEmpty(annotationValue) ? className : annotationValue;
     }
 }
