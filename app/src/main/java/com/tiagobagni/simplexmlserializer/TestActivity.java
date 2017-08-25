@@ -6,8 +6,15 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.tiagobagni.simplexmlserializer.sampleobjects.Product;
@@ -20,19 +27,23 @@ import com.tiagobagni.simplexmlserializerlib.xml.XmlDeserializer;
 import com.tiagobagni.simplexmlserializerlib.xml.XmlSerializer;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class TestActivity extends AppCompatActivity {
     private static final String TAG = "TestActivity";
 
+    private static final String LOG_OUTPUT_STATE = "logOutput";
+
     private Button serializeButton;
     private Button deserializeButton;
-    private Button cleanButton;
-    private Button showLogsButton;
     private EditText outputText;
+    private Spinner objectsSpinner;
+
     private StringBuilder logOutput;
 
     private Object objectToSerialize;
+    ArrayAdapter<SpinnerItem> objectsAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,16 +52,27 @@ public class TestActivity extends AppCompatActivity {
 
         serializeButton = findViewById(R.id.serialize_btn);
         deserializeButton = findViewById(R.id.deserialize_btn);
-        cleanButton = findViewById(R.id.clean_btn);
         outputText = findViewById(R.id.output_text);
-        showLogsButton = findViewById(R.id.show_logs_btn);
+        objectsSpinner = findViewById(R.id.objects_spinner);
 
+        objectsAdapter = new ArrayAdapter<>(this,
+                android.R.layout.simple_spinner_dropdown_item);
+        objectsAdapter.addAll(getObjectsToSerialize());
+        objectsSpinner.setAdapter(objectsAdapter);
+
+        objectsSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
+                objectToSerialize = objectsAdapter.getItem(position).object;
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+                objectToSerialize = null;
+            }
+        });
         serializeButton.setOnClickListener(v -> serialize());
         deserializeButton.setOnClickListener(v -> deserialize());
-        cleanButton.setOnClickListener(v -> outputText.setText(""));
-        showLogsButton.setOnClickListener(v -> showLogs());
-
-        initializeObjectToSerialize();
 
         SimpleXmlParams.get().setDebugMode(true);
         // Replace the default logger (Which is the logcat) so we can show the logs
@@ -83,6 +105,36 @@ public class TestActivity extends AppCompatActivity {
                 Log.e(TAG, errorMsg, error); // Also show in logcat
             }
         });
+
+        if (savedInstanceState != null) {
+            logOutput = (StringBuilder) savedInstanceState.getSerializable(LOG_OUTPUT_STATE);
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putSerializable(LOG_OUTPUT_STATE, logOutput);
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.test_activity_options, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_clear_output:
+                outputText.setText("");
+                return true;
+            case R.id.menu_show_log:
+                showLogs();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     private void serialize() {
@@ -129,9 +181,25 @@ public class TestActivity extends AppCompatActivity {
                 getResources().getDimension(R.dimen.output_text_size));
     }
 
-    private void initializeObjectToSerialize() {
-        // Change object here to serialize/deserialize a different object
-        objectToSerialize = getShoppingCart();
+    private List<SpinnerItem> getObjectsToSerialize() {
+        return Arrays.asList(new SpinnerItem[] {
+                new SpinnerItem(getShoppingCart()),
+                new SpinnerItem(getRss())
+
+        });
+    }
+
+    private static class SpinnerItem {
+        public final Object object;
+
+        public SpinnerItem(Object object) {
+            this.object = object;
+        }
+
+        @Override
+        public String toString() {
+            return object.getClass().getSimpleName();
+        }
     }
 
 

@@ -7,9 +7,9 @@ import com.tiagobagni.simplexmlserializerlib.xml.annotation.XmlObjects;
 
 import java.util.List;
 
-@XmlClass
+@XmlClass("rss")
 public class Rss {
-    @XmlObject("channel") public Channel channel;
+    @XmlObject public Channel channel;
 
     @Override
     public String toString() {
@@ -20,12 +20,12 @@ public class Rss {
 
     @XmlClass
     public static class Channel {
-        @XmlField("title") public String title;
-        @XmlField("link") public String link;
-        @XmlField("description") public String description;
-        @XmlField("language") public String language;
-        @XmlField("copyright") public String copyright;
-        @XmlField("pubDate") public String pubDate;
+        @XmlField public String title;
+        @XmlField public String link;
+        @XmlField public String description;
+        @XmlField public String language;
+        @XmlField public String copyright;
+        @XmlField public String pubDate;
         @XmlObjects("item") public List<Feed> feed;
 
         @Override
@@ -44,11 +44,11 @@ public class Rss {
 
     @XmlClass
     public static class Feed {
-        @XmlField("title") public String title;
-        @XmlField("description") public String description;
-        @XmlField("link") public String link;
-        @XmlField("author") public String author;
-        @XmlField("guid") public String guid;
+        @XmlField public String title;
+        @XmlField public String description;
+        @XmlField public String link;
+        @XmlField public String author;
+        @XmlField public String guid;
 
         @Override
         public String toString() {
