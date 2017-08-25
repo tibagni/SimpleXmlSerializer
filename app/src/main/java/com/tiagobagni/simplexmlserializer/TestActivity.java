@@ -13,8 +13,10 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import com.tiagobagni.simplexmlserializer.sampleobjects.Product;
@@ -39,6 +41,7 @@ public class TestActivity extends AppCompatActivity {
     private Button deserializeButton;
     private EditText outputText;
     private Spinner objectsSpinner;
+    private Switch shouldIndent;
 
     private StringBuilder logOutput;
 
@@ -54,6 +57,7 @@ public class TestActivity extends AppCompatActivity {
         deserializeButton = findViewById(R.id.deserialize_btn);
         outputText = findViewById(R.id.output_text);
         objectsSpinner = findViewById(R.id.objects_spinner);
+        shouldIndent = findViewById(R.id.should_indent_switch);
 
         objectsAdapter = new ArrayAdapter<>(this,
                 android.R.layout.simple_spinner_dropdown_item);
@@ -73,6 +77,8 @@ public class TestActivity extends AppCompatActivity {
         });
         serializeButton.setOnClickListener(v -> serialize());
         deserializeButton.setOnClickListener(v -> deserialize());
+        shouldIndent.setOnCheckedChangeListener((compoundButton, checked) ->
+                SimpleXmlParams.get().indentOutput(checked));
 
         SimpleXmlParams.get().setDebugMode(true);
         // Replace the default logger (Which is the logcat) so we can show the logs

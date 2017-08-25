@@ -4,4 +4,5 @@
     <string name="btn_deserialize">Deserialize</string>
     <string name="clear_output">Clear output</string>
     <string name="show_logs">Show Logs</string>
+    <string name="should_indent">Indent output</string>
 </resources>
