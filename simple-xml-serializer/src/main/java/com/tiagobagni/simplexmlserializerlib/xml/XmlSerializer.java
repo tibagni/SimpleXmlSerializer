@@ -153,12 +153,18 @@ public class XmlSerializer {
         if (DBG) LOGGER.debug("writing primitive: " + tag + " = " + value);
         indent(nestedSpacing);
         open(tag);
-        content(value);
+        content(value == null ? "" : value);
         close(tag);
     }
 
     private void writeXmlObject(String tag, Object value) throws IllegalAccessException {
         if (DBG) LOGGER.debug("writing object: " + tag + " = " + value);
+
+        if (value == null) {
+            if (DBG) LOGGER.debug("Skip object because it is null");
+            return;
+        }
+
         if (nestedSerializer == null) {
             nestedSerializer = new XmlSerializer();
         }
@@ -171,6 +177,12 @@ public class XmlSerializer {
 
     private void writeXmlList(String tag, List items) throws IllegalAccessException {
         if (DBG) LOGGER.debug("writing list: " + tag);
+
+        if (items == null) {
+            if (DBG) LOGGER.debug("Skip list because it is null");
+            return;
+        }
+
         indent(nestedSpacing);
         open(tag);
         newLine();
@@ -187,6 +199,11 @@ public class XmlSerializer {
     }
 
     private void writeMultipleItems(String tag, List items) throws IllegalAccessException {
+        if (items == null) {
+            if (DBG) LOGGER.debug("Skip multiple objects because it is null");
+            return;
+        }
+
         for (Object item : items) {
             // For objects in a List, use the class name as tag
             writeXmlObject(tag, item);
