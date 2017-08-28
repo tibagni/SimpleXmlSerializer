@@ -1,6 +1,7 @@
 package com.tiagobagni.simplexmlserializer;
 
 import com.tiagobagni.simplexmlserializer.sampleobjects.NestedXmlObject;
+import com.tiagobagni.simplexmlserializer.sampleobjects.NestedXmlObject2;
 import com.tiagobagni.simplexmlserializer.sampleobjects.SimpleListXmlObject;
 import com.tiagobagni.simplexmlserializer.sampleobjects.SimpleXmlMultipleObjects;
 import com.tiagobagni.simplexmlserializer.sampleobjects.SimpleXmlObject;
@@ -292,6 +293,571 @@ public class SerializerTests {
         String expected = "<?xml version=\"1.0\"?><SimpleXmlMultipleObjects>" +
                 "<primitiveValue>0</primitiveValue>" +
                 "</SimpleXmlMultipleObjects>";
+
+        String actual = serializer.serialize(obj);
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void test_nestedXmlObjects2AllValues() throws IllegalAccessException {
+        NestedXmlObject.InnerXmlObject inner = new NestedXmlObject.InnerXmlObject();
+        inner.stringVal = "Inner String Val";
+
+        NestedXmlObject nested = new NestedXmlObject();
+        nested.stringPrimitiveVal = "My String Value";
+        nested.primitiveVal2 = true;
+        nested.primitiveVal1 = 10;
+        nested.innerObject = inner;
+
+        SimpleXmlObject simple = new SimpleXmlObject();
+        simple.stringVal = "My String";
+        simple.booleanVal = true;
+        simple.floatVal = 7.2f;
+        simple.doubleVal = 1.7;
+        simple.longVal = 922;
+        simple.intVal = 85;
+
+        SimpleListXmlObject list = new SimpleListXmlObject();
+        list.primitiveValue = 100;
+        list.items = new ArrayList<>();
+
+        SimpleListXmlObject.Item item = new SimpleListXmlObject.Item();
+        item.value = 10;
+
+        list.items.add(item);
+        list.items.add(item);
+        list.items.add(item);
+
+        item = new SimpleListXmlObject.Item();
+        item.value = 15;
+
+        list.items.add(item);
+        list.items.add(item);
+        list.items.add(item);
+
+        SimpleXmlMultipleObjects multiple = new SimpleXmlMultipleObjects();
+        multiple.primitiveValue = 1000;
+        multiple.items = new ArrayList<>();
+
+        SimpleXmlMultipleObjects.Item item2 = new SimpleXmlMultipleObjects.Item();
+        item2.value = 100;
+
+        multiple.items.add(item2);
+        multiple.items.add(item2);
+        multiple.items.add(item2);
+
+        item2 = new SimpleXmlMultipleObjects.Item();
+        item2.value = 150;
+
+        multiple.items.add(item2);
+        multiple.items.add(item2);
+        multiple.items.add(item2);
+
+        NestedXmlObject2 obj = new NestedXmlObject2();
+        obj.nested = nested;
+        obj.simple = simple;
+        obj.list = list;
+        obj.multiple = multiple;
+
+        String expected = "<?xml version=\"1.0\"?><NestedXmlObject2>" +
+                "<nested>" +
+                "<stringPrimitiveVal>My String Value</stringPrimitiveVal>" +
+                "<primitiveVal2>true</primitiveVal2>" +
+                "<primitiveVal1>10</primitiveVal1>" +
+                "<innerObject>" +
+                "<stringVal>Inner String Val</stringVal>" +
+                "</innerObject>" +
+                "</nested>" +
+                "<simple>" +
+                "<string>My String</string>" +
+                "<boolean>true</boolean>" +
+                "<float>7.2</float>" +
+                "<double>1.7</double>" +
+                "<long>922</long>" +
+                "<int>85</int>" +
+                "</simple>" +
+                "<list>" +
+                "<primitiveValue>100</primitiveValue>" +
+                "<items>" +
+                "<Item><value>10</value></Item>" +
+                "<Item><value>10</value></Item>" +
+                "<Item><value>10</value></Item>" +
+                "<Item><value>15</value></Item>" +
+                "<Item><value>15</value></Item>" +
+                "<Item><value>15</value></Item>" +
+                "</items>" +
+                "</list>" +
+                "<multiple>" +
+                "<primitiveValue>1000</primitiveValue>" +
+                "<item><value>100</value></item>" +
+                "<item><value>100</value></item>" +
+                "<item><value>100</value></item>" +
+                "<item><value>150</value></item>" +
+                "<item><value>150</value></item>" +
+                "<item><value>150</value></item>" +
+                "</multiple>" +
+                "</NestedXmlObject2>";
+
+        String actual = serializer.serialize(obj);
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void test_nestedXmlObjects2NoSimpleValues() throws IllegalAccessException {
+        NestedXmlObject.InnerXmlObject inner = new NestedXmlObject.InnerXmlObject();
+        inner.stringVal = "Inner String Val";
+
+        NestedXmlObject nested = new NestedXmlObject();
+        nested.stringPrimitiveVal = "My String Value";
+        nested.primitiveVal2 = true;
+        nested.primitiveVal1 = 10;
+        nested.innerObject = inner;
+
+        SimpleListXmlObject list = new SimpleListXmlObject();
+        list.primitiveValue = 100;
+        list.items = new ArrayList<>();
+
+        SimpleListXmlObject.Item item = new SimpleListXmlObject.Item();
+        item.value = 10;
+
+        list.items.add(item);
+        list.items.add(item);
+        list.items.add(item);
+
+        item = new SimpleListXmlObject.Item();
+        item.value = 15;
+
+        list.items.add(item);
+        list.items.add(item);
+        list.items.add(item);
+
+        SimpleXmlMultipleObjects multiple = new SimpleXmlMultipleObjects();
+        multiple.primitiveValue = 1000;
+        multiple.items = new ArrayList<>();
+
+        SimpleXmlMultipleObjects.Item item2 = new SimpleXmlMultipleObjects.Item();
+        item2.value = 100;
+
+        multiple.items.add(item2);
+        multiple.items.add(item2);
+        multiple.items.add(item2);
+
+        item2 = new SimpleXmlMultipleObjects.Item();
+        item2.value = 150;
+
+        multiple.items.add(item2);
+        multiple.items.add(item2);
+        multiple.items.add(item2);
+
+        NestedXmlObject2 obj = new NestedXmlObject2();
+        obj.nested = nested;
+        obj.list = list;
+        obj.multiple = multiple;
+
+        String expected = "<?xml version=\"1.0\"?><NestedXmlObject2>" +
+                "<nested>" +
+                "<stringPrimitiveVal>My String Value</stringPrimitiveVal>" +
+                "<primitiveVal2>true</primitiveVal2>" +
+                "<primitiveVal1>10</primitiveVal1>" +
+                "<innerObject>" +
+                "<stringVal>Inner String Val</stringVal>" +
+                "</innerObject>" +
+                "</nested>" +
+                "<list>" +
+                "<primitiveValue>100</primitiveValue>" +
+                "<items>" +
+                "<Item><value>10</value></Item>" +
+                "<Item><value>10</value></Item>" +
+                "<Item><value>10</value></Item>" +
+                "<Item><value>15</value></Item>" +
+                "<Item><value>15</value></Item>" +
+                "<Item><value>15</value></Item>" +
+                "</items>" +
+                "</list>" +
+                "<multiple>" +
+                "<primitiveValue>1000</primitiveValue>" +
+                "<item><value>100</value></item>" +
+                "<item><value>100</value></item>" +
+                "<item><value>100</value></item>" +
+                "<item><value>150</value></item>" +
+                "<item><value>150</value></item>" +
+                "<item><value>150</value></item>" +
+                "</multiple>" +
+                "</NestedXmlObject2>";
+
+        String actual = serializer.serialize(obj);
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void test_nestedXmlObjects2NoNested() throws IllegalAccessException {
+        SimpleXmlObject simple = new SimpleXmlObject();
+        simple.stringVal = "My String";
+        simple.booleanVal = true;
+        simple.floatVal = 7.2f;
+        simple.doubleVal = 1.7;
+        simple.longVal = 922;
+        simple.intVal = 85;
+
+        SimpleListXmlObject list = new SimpleListXmlObject();
+        list.primitiveValue = 100;
+        list.items = new ArrayList<>();
+
+        SimpleListXmlObject.Item item = new SimpleListXmlObject.Item();
+        item.value = 10;
+
+        list.items.add(item);
+        list.items.add(item);
+        list.items.add(item);
+
+        item = new SimpleListXmlObject.Item();
+        item.value = 15;
+
+        list.items.add(item);
+        list.items.add(item);
+        list.items.add(item);
+
+        SimpleXmlMultipleObjects multiple = new SimpleXmlMultipleObjects();
+        multiple.primitiveValue = 1000;
+        multiple.items = new ArrayList<>();
+
+        SimpleXmlMultipleObjects.Item item2 = new SimpleXmlMultipleObjects.Item();
+        item2.value = 100;
+
+        multiple.items.add(item2);
+        multiple.items.add(item2);
+        multiple.items.add(item2);
+
+        item2 = new SimpleXmlMultipleObjects.Item();
+        item2.value = 150;
+
+        multiple.items.add(item2);
+        multiple.items.add(item2);
+        multiple.items.add(item2);
+
+        NestedXmlObject2 obj = new NestedXmlObject2();
+        obj.simple = simple;
+        obj.list = list;
+        obj.multiple = multiple;
+
+        String expected = "<?xml version=\"1.0\"?><NestedXmlObject2>" +
+                "<simple>" +
+                "<string>My String</string>" +
+                "<boolean>true</boolean>" +
+                "<float>7.2</float>" +
+                "<double>1.7</double>" +
+                "<long>922</long>" +
+                "<int>85</int>" +
+                "</simple>" +
+                "<list>" +
+                "<primitiveValue>100</primitiveValue>" +
+                "<items>" +
+                "<Item><value>10</value></Item>" +
+                "<Item><value>10</value></Item>" +
+                "<Item><value>10</value></Item>" +
+                "<Item><value>15</value></Item>" +
+                "<Item><value>15</value></Item>" +
+                "<Item><value>15</value></Item>" +
+                "</items>" +
+                "</list>" +
+                "<multiple>" +
+                "<primitiveValue>1000</primitiveValue>" +
+                "<item><value>100</value></item>" +
+                "<item><value>100</value></item>" +
+                "<item><value>100</value></item>" +
+                "<item><value>150</value></item>" +
+                "<item><value>150</value></item>" +
+                "<item><value>150</value></item>" +
+                "</multiple>" +
+                "</NestedXmlObject2>";
+
+        String actual = serializer.serialize(obj);
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void test_nestedXmlObjects2NoList() throws IllegalAccessException {
+        NestedXmlObject.InnerXmlObject inner = new NestedXmlObject.InnerXmlObject();
+        inner.stringVal = "Inner String Val";
+
+        NestedXmlObject nested = new NestedXmlObject();
+        nested.stringPrimitiveVal = "My String Value";
+        nested.primitiveVal2 = true;
+        nested.primitiveVal1 = 10;
+        nested.innerObject = inner;
+
+        SimpleXmlObject simple = new SimpleXmlObject();
+        simple.stringVal = "My String";
+        simple.booleanVal = true;
+        simple.floatVal = 7.2f;
+        simple.doubleVal = 1.7;
+        simple.longVal = 922;
+        simple.intVal = 85;
+
+        SimpleXmlMultipleObjects multiple = new SimpleXmlMultipleObjects();
+        multiple.primitiveValue = 1000;
+        multiple.items = new ArrayList<>();
+
+        SimpleXmlMultipleObjects.Item item2 = new SimpleXmlMultipleObjects.Item();
+        item2.value = 100;
+
+        multiple.items.add(item2);
+        multiple.items.add(item2);
+        multiple.items.add(item2);
+
+        item2 = new SimpleXmlMultipleObjects.Item();
+        item2.value = 150;
+
+        multiple.items.add(item2);
+        multiple.items.add(item2);
+        multiple.items.add(item2);
+
+        NestedXmlObject2 obj = new NestedXmlObject2();
+        obj.nested = nested;
+        obj.simple = simple;
+        obj.multiple = multiple;
+
+        String expected = "<?xml version=\"1.0\"?><NestedXmlObject2>" +
+                "<nested>" +
+                "<stringPrimitiveVal>My String Value</stringPrimitiveVal>" +
+                "<primitiveVal2>true</primitiveVal2>" +
+                "<primitiveVal1>10</primitiveVal1>" +
+                "<innerObject>" +
+                "<stringVal>Inner String Val</stringVal>" +
+                "</innerObject>" +
+                "</nested>" +
+                "<simple>" +
+                "<string>My String</string>" +
+                "<boolean>true</boolean>" +
+                "<float>7.2</float>" +
+                "<double>1.7</double>" +
+                "<long>922</long>" +
+                "<int>85</int>" +
+                "</simple>" +
+                "<multiple>" +
+                "<primitiveValue>1000</primitiveValue>" +
+                "<item><value>100</value></item>" +
+                "<item><value>100</value></item>" +
+                "<item><value>100</value></item>" +
+                "<item><value>150</value></item>" +
+                "<item><value>150</value></item>" +
+                "<item><value>150</value></item>" +
+                "</multiple>" +
+                "</NestedXmlObject2>";
+
+        String actual = serializer.serialize(obj);
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void test_nestedXmlObjects2NoMultiple() throws IllegalAccessException {
+        NestedXmlObject.InnerXmlObject inner = new NestedXmlObject.InnerXmlObject();
+        inner.stringVal = "Inner String Val";
+
+        NestedXmlObject nested = new NestedXmlObject();
+        nested.stringPrimitiveVal = "My String Value";
+        nested.primitiveVal2 = true;
+        nested.primitiveVal1 = 10;
+        nested.innerObject = inner;
+
+        SimpleXmlObject simple = new SimpleXmlObject();
+        simple.stringVal = "My String";
+        simple.booleanVal = true;
+        simple.floatVal = 7.2f;
+        simple.doubleVal = 1.7;
+        simple.longVal = 922;
+        simple.intVal = 85;
+
+        SimpleListXmlObject list = new SimpleListXmlObject();
+        list.primitiveValue = 100;
+        list.items = new ArrayList<>();
+
+        SimpleListXmlObject.Item item = new SimpleListXmlObject.Item();
+        item.value = 10;
+
+        list.items.add(item);
+        list.items.add(item);
+        list.items.add(item);
+
+        item = new SimpleListXmlObject.Item();
+        item.value = 15;
+
+        list.items.add(item);
+        list.items.add(item);
+        list.items.add(item);
+
+        NestedXmlObject2 obj = new NestedXmlObject2();
+        obj.nested = nested;
+        obj.simple = simple;
+        obj.list = list;
+
+        String expected = "<?xml version=\"1.0\"?><NestedXmlObject2>" +
+                "<nested>" +
+                "<stringPrimitiveVal>My String Value</stringPrimitiveVal>" +
+                "<primitiveVal2>true</primitiveVal2>" +
+                "<primitiveVal1>10</primitiveVal1>" +
+                "<innerObject>" +
+                "<stringVal>Inner String Val</stringVal>" +
+                "</innerObject>" +
+                "</nested>" +
+                "<simple>" +
+                "<string>My String</string>" +
+                "<boolean>true</boolean>" +
+                "<float>7.2</float>" +
+                "<double>1.7</double>" +
+                "<long>922</long>" +
+                "<int>85</int>" +
+                "</simple>" +
+                "<list>" +
+                "<primitiveValue>100</primitiveValue>" +
+                "<items>" +
+                "<Item><value>10</value></Item>" +
+                "<Item><value>10</value></Item>" +
+                "<Item><value>10</value></Item>" +
+                "<Item><value>15</value></Item>" +
+                "<Item><value>15</value></Item>" +
+                "<Item><value>15</value></Item>" +
+                "</items>" +
+                "</list>" +
+                "</NestedXmlObject2>";
+
+        String actual = serializer.serialize(obj);
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void test_nestedXmlObjects2OnlySimple() throws IllegalAccessException {
+        SimpleXmlObject simple = new SimpleXmlObject();
+        simple.stringVal = "My String";
+        simple.booleanVal = true;
+        simple.floatVal = 7.2f;
+        simple.doubleVal = 1.7;
+        simple.longVal = 922;
+        simple.intVal = 85;
+
+        NestedXmlObject2 obj = new NestedXmlObject2();
+        obj.simple = simple;
+
+        String expected = "<?xml version=\"1.0\"?><NestedXmlObject2>" +
+                "<simple>" +
+                "<string>My String</string>" +
+                "<boolean>true</boolean>" +
+                "<float>7.2</float>" +
+                "<double>1.7</double>" +
+                "<long>922</long>" +
+                "<int>85</int>" +
+                "</simple>" +
+                "</NestedXmlObject2>";
+
+        String actual = serializer.serialize(obj);
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void test_nestedXmlObjects2OnlyNested() throws IllegalAccessException {
+        NestedXmlObject.InnerXmlObject inner = new NestedXmlObject.InnerXmlObject();
+        inner.stringVal = "Inner String Val";
+
+        NestedXmlObject nested = new NestedXmlObject();
+        nested.stringPrimitiveVal = "My String Value";
+        nested.primitiveVal2 = true;
+        nested.primitiveVal1 = 10;
+        nested.innerObject = inner;
+
+        NestedXmlObject2 obj = new NestedXmlObject2();
+        obj.nested = nested;
+
+        String expected = "<?xml version=\"1.0\"?><NestedXmlObject2>" +
+                "<nested>" +
+                "<stringPrimitiveVal>My String Value</stringPrimitiveVal>" +
+                "<primitiveVal2>true</primitiveVal2>" +
+                "<primitiveVal1>10</primitiveVal1>" +
+                "<innerObject>" +
+                "<stringVal>Inner String Val</stringVal>" +
+                "</innerObject>" +
+                "</nested>" +
+                "</NestedXmlObject2>";
+
+        String actual = serializer.serialize(obj);
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void test_nestedXmlObjects2OnlyList() throws IllegalAccessException {
+
+        SimpleListXmlObject list = new SimpleListXmlObject();
+        list.primitiveValue = 100;
+        list.items = new ArrayList<>();
+
+        SimpleListXmlObject.Item item = new SimpleListXmlObject.Item();
+        item.value = 10;
+
+        list.items.add(item);
+        list.items.add(item);
+        list.items.add(item);
+
+        item = new SimpleListXmlObject.Item();
+        item.value = 15;
+
+        list.items.add(item);
+        list.items.add(item);
+        list.items.add(item);
+
+        NestedXmlObject2 obj = new NestedXmlObject2();
+        obj.list = list;
+
+        String expected = "<?xml version=\"1.0\"?><NestedXmlObject2>" +
+                "<list>" +
+                "<primitiveValue>100</primitiveValue>" +
+                "<items>" +
+                "<Item><value>10</value></Item>" +
+                "<Item><value>10</value></Item>" +
+                "<Item><value>10</value></Item>" +
+                "<Item><value>15</value></Item>" +
+                "<Item><value>15</value></Item>" +
+                "<Item><value>15</value></Item>" +
+                "</items>" +
+                "</list>" +
+                "</NestedXmlObject2>";
+
+        String actual = serializer.serialize(obj);
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void test_nestedXmlObjects2OnlyMultiple() throws IllegalAccessException {
+        SimpleXmlMultipleObjects multiple = new SimpleXmlMultipleObjects();
+        multiple.primitiveValue = 1000;
+        multiple.items = new ArrayList<>();
+
+        SimpleXmlMultipleObjects.Item item2 = new SimpleXmlMultipleObjects.Item();
+        item2.value = 100;
+
+        multiple.items.add(item2);
+        multiple.items.add(item2);
+        multiple.items.add(item2);
+
+        item2 = new SimpleXmlMultipleObjects.Item();
+        item2.value = 150;
+
+        multiple.items.add(item2);
+        multiple.items.add(item2);
+        multiple.items.add(item2);
+
+        NestedXmlObject2 obj = new NestedXmlObject2();
+        obj.multiple = multiple;
+
+        String expected = "<?xml version=\"1.0\"?><NestedXmlObject2>" +
+                "<multiple>" +
+                "<primitiveValue>1000</primitiveValue>" +
+                "<item><value>100</value></item>" +
+                "<item><value>100</value></item>" +
+                "<item><value>100</value></item>" +
+                "<item><value>150</value></item>" +
+                "<item><value>150</value></item>" +
+                "<item><value>150</value></item>" +
+                "</multiple>" +
+                "</NestedXmlObject2>";
 
         String actual = serializer.serialize(obj);
         assertEquals(expected, actual);
