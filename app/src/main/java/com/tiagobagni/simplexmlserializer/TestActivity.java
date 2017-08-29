@@ -77,8 +77,8 @@ public class TestActivity extends AppCompatActivity {
         });
         serializeButton.setOnClickListener(v -> serialize());
         deserializeButton.setOnClickListener(v -> deserialize());
-        shouldIndent.setOnCheckedChangeListener((compoundButton, checked) ->
-                SimpleXmlParams.get().indentOutput(checked));
+//        shouldIndent.setOnCheckedChangeListener((compoundButton, checked) ->
+//                SimpleXmlParams.get().indentOutput(checked));
 
         SimpleXmlParams.get().setDebugMode(true);
         // Replace the default logger (Which is the logcat) so we can show the logs

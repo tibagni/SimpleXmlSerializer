@@ -26,8 +26,8 @@ public class SerializerTests {
     @Before
     public void setUp() {
         SimpleXmlParams.get().setDebugMode(false);
-        SimpleXmlParams.get().indentOutput(false);
         serializer = new XmlSerializer();
+        serializer.setIndentOutput(false);
     }
 
     @Test
@@ -858,6 +858,32 @@ public class SerializerTests {
                 "<item><value>150</value></item>" +
                 "</multiple>" +
                 "</NestedXmlObject2>";
+
+        String actual = serializer.serialize(obj);
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void test_nestedXmlObjectAllValuesIndentedOutput() throws IllegalAccessException {
+        serializer.setIndentOutput(true);
+        NestedXmlObject.InnerXmlObject inner = new NestedXmlObject.InnerXmlObject();
+        inner.stringVal = "Inner String Val";
+
+        NestedXmlObject obj = new NestedXmlObject();
+        obj.stringPrimitiveVal = "My String Value";
+        obj.primitiveVal2 = true;
+        obj.primitiveVal1 = 10;
+        obj.innerObject = inner;
+
+        String expected = "<?xml version=\"1.0\"?>\n" +
+                "<NestedXmlObject>\n" +
+                "  <stringPrimitiveVal>My String Value</stringPrimitiveVal>\n" +
+                "  <primitiveVal2>true</primitiveVal2>\n" +
+                "  <primitiveVal1>10</primitiveVal1>\n" +
+                "  <innerObject>\n" +
+                "    <stringVal>Inner String Val</stringVal>\n" +
+                "  </innerObject>\n" +
+                "</NestedXmlObject>";
 
         String actual = serializer.serialize(obj);
         assertEquals(expected, actual);

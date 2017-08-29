@@ -33,14 +33,22 @@ public class XmlSerializer {
     private XmlSerializer nestedSerializer;
 
     private final boolean DBG;
-    private final boolean SHOULD_INDENT;
+    private boolean indentOutput;
     private final XmlSerializerLogger LOGGER;
 
     public XmlSerializer() {
         SimpleXmlParams params = SimpleXmlParams.get();
         DBG = params.isDebugMode();
-        SHOULD_INDENT = params.shouldIndentOutput();
         LOGGER = params.getLogger();
+        indentOutput = true;
+    }
+
+    /**
+     * Enable/Disable indentation for output xml (enabled by default)
+     * @param indentOutput
+     */
+    public void setIndentOutput(boolean indentOutput) {
+        this.indentOutput = indentOutput;
     }
 
     /**
@@ -167,6 +175,7 @@ public class XmlSerializer {
 
         if (nestedSerializer == null) {
             nestedSerializer = new XmlSerializer();
+            nestedSerializer.setIndentOutput(indentOutput);
         }
 
         nestedSerializer.initializeFor(value);
@@ -238,13 +247,13 @@ public class XmlSerializer {
     }
 
     private void newLine() {
-        if (SHOULD_INDENT) {
+        if (indentOutput) {
             xmlBuilder.append(NEW_LINE);
         }
     }
 
     private void indent(String spacing) {
-        if (SHOULD_INDENT) {
+        if (indentOutput) {
             xmlBuilder.append(spacing);
         }
     }
