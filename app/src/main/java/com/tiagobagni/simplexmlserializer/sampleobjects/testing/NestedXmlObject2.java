@@ -1,4 +1,4 @@
-package com.tiagobagni.simplexmlserializer.sampleobjects;
+package com.tiagobagni.simplexmlserializer.sampleobjects.testing;
 
 import com.tiagobagni.simplexmlserializerlib.xml.annotation.XmlClass;
 import com.tiagobagni.simplexmlserializerlib.xml.annotation.XmlObject;

@@ -1,10 +1,10 @@
 package com.tiagobagni.simplexmlserializer;
 
-import com.tiagobagni.simplexmlserializer.sampleobjects.NestedXmlObject;
-import com.tiagobagni.simplexmlserializer.sampleobjects.NestedXmlObject2;
-import com.tiagobagni.simplexmlserializer.sampleobjects.SimpleListXmlObject;
-import com.tiagobagni.simplexmlserializer.sampleobjects.SimpleXmlMultipleObjects;
-import com.tiagobagni.simplexmlserializer.sampleobjects.SimpleXmlObject;
+import com.tiagobagni.simplexmlserializer.sampleobjects.testing.NestedXmlObject;
+import com.tiagobagni.simplexmlserializer.sampleobjects.testing.NestedXmlObject2;
+import com.tiagobagni.simplexmlserializer.sampleobjects.testing.SimpleListXmlObject;
+import com.tiagobagni.simplexmlserializer.sampleobjects.testing.SimpleXmlMultipleObjects;
+import com.tiagobagni.simplexmlserializer.sampleobjects.testing.SimpleXmlObject;
 import com.tiagobagni.simplexmlserializerlib.xml.SimpleXmlParams;
 import com.tiagobagni.simplexmlserializerlib.xml.XmlSerializer;
 
