@@ -252,7 +252,17 @@ public class XmlDeserializer {
 
         Annotation fieldAnnotation = fieldWrapper == null ? null : fieldWrapper.annotation;
         if (fieldAnnotation instanceof XmlField) {
-            parsePrimitiveValue(fieldWrapper.field, value);
+            tryParsePrimitiveValue(fieldWrapper.field, value);
+        }
+    }
+
+    private void tryParsePrimitiveValue(Field field, String value)
+            throws XmlDeserializationException {
+        try {
+            parsePrimitiveValue(field, value);
+        } catch (Throwable tr) {
+            throw new XmlDeserializationException("Error parsing " + value +
+                    " for " + field.getName(), tr);
         }
     }
 

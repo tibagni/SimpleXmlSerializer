@@ -122,6 +122,7 @@ public class XmlSerializer {
         Field[] fields = getOrderedFields();
         for (Field field : fields) {
             Annotation annotation = ReflectionUtils.getFieldAnnotation(field);
+            if (annotation == null) continue;
             field.setAccessible(true);
             Object value = field.get(xmlObject);
 

@@ -239,4 +239,90 @@ public class DeserializerTests {
 
         assertEquals(expected, actual);
     }
+
+    @Test(expected = XmlDeserializationException.class)
+    public void test_simpleXmlObjectBadValues() throws XmlDeserializationException {
+        XmlDeserializer deserializer = new XmlDeserializer(SimpleXmlObject.class);
+        deserializer.deserialize(
+                "<?xml version=\"1.0\"?><simple>" +
+                        "<string>My String</string>" +
+                        "<boolean>true</boolean>" +
+                        "<float>d</float>" +
+                        "</simple>");
+    }
+
+    @Test(expected = XmlDeserializationException.class)
+    public void test_simpleXmlObjectBadValues2() throws XmlDeserializationException {
+        XmlDeserializer deserializer = new XmlDeserializer(SimpleXmlObject.class);
+        deserializer.deserialize(
+                "<?xml version=\"1.0\"?><simple>" +
+                        "<string>My String</string>" +
+                        "<boolean>true</boolean>" +
+                        "<double>w</double>" +
+                        "</simple>");
+    }
+
+    @Test(expected = XmlDeserializationException.class)
+    public void test_simpleXmlObjectBadValues3() throws XmlDeserializationException {
+        XmlDeserializer deserializer = new XmlDeserializer(SimpleXmlObject.class);
+        deserializer.deserialize(
+                "<?xml version=\"1.0\"?><simple>" +
+                        "<string>My String</string>" +
+                        "<boolean>true</boolean>" +
+                        "<long>3.1</long>" +
+                        "</simple>");
+    }
+
+    @Test(expected = XmlDeserializationException.class)
+    public void test_simpleXmlObjectBadValues4() throws XmlDeserializationException {
+        XmlDeserializer deserializer = new XmlDeserializer(SimpleXmlObject.class);
+        deserializer.deserialize(
+                "<?xml version=\"1.0\"?><simple>" +
+                        "<string>My String</string>" +
+                        "<boolean>true</boolean>" +
+                        "<int>3.3</int>" +
+                        "</simple>");
+    }
+
+    @Test
+    public void test_simpleXmlObjectBadBoolean() throws XmlDeserializationException {
+        XmlDeserializer deserializer = new XmlDeserializer(SimpleXmlObject.class);
+        SimpleXmlObject actual = (SimpleXmlObject) deserializer.deserialize(
+                "<?xml version=\"1.0\"?><simple>" +
+                        "<boolean>truuuuue</boolean>" +
+                        "</simple>");
+
+        SimpleXmlObject expected = new SimpleXmlObject();
+        expected.booleanVal = false;
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void test_simpleXmlObjectBadBooleanAllCaps() throws XmlDeserializationException {
+        XmlDeserializer deserializer = new XmlDeserializer(SimpleXmlObject.class);
+        SimpleXmlObject actual = (SimpleXmlObject) deserializer.deserialize(
+                "<?xml version=\"1.0\"?><simple>" +
+                        "<boolean>TRUE</boolean>" +
+                        "</simple>");
+
+        SimpleXmlObject expected = new SimpleXmlObject();
+        expected.booleanVal = true;
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void test_simpleXmlObjectBadBooleanFirstLetterCaps() throws XmlDeserializationException {
+        XmlDeserializer deserializer = new XmlDeserializer(SimpleXmlObject.class);
+        SimpleXmlObject actual = (SimpleXmlObject) deserializer.deserialize(
+                "<?xml version=\"1.0\"?><simple>" +
+                        "<boolean>True</boolean>" +
+                        "</simple>");
+
+        SimpleXmlObject expected = new SimpleXmlObject();
+        expected.booleanVal = true;
+
+        assertEquals(expected, actual);
+    }
 }
