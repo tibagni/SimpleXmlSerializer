@@ -13,10 +13,8 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Spinner;
-import android.widget.Switch;
 import android.widget.TextView;
 
 import com.tiagobagni.simplexmlserializer.sampleobjects.Product;
@@ -41,9 +39,9 @@ public class TestActivity extends AppCompatActivity {
     private Button deserializeButton;
     private EditText outputText;
     private Spinner objectsSpinner;
-    private Switch shouldIndent;
 
     private StringBuilder logOutput;
+    private boolean shouldIndent = true;
 
     private Object objectToSerialize;
     ArrayAdapter<SpinnerItem> objectsAdapter;
@@ -57,7 +55,6 @@ public class TestActivity extends AppCompatActivity {
         deserializeButton = findViewById(R.id.deserialize_btn);
         outputText = findViewById(R.id.output_text);
         objectsSpinner = findViewById(R.id.objects_spinner);
-        shouldIndent = findViewById(R.id.should_indent_switch);
 
         objectsAdapter = new ArrayAdapter<>(this,
                 android.R.layout.simple_spinner_dropdown_item);
@@ -77,8 +74,6 @@ public class TestActivity extends AppCompatActivity {
         });
         serializeButton.setOnClickListener(v -> serialize());
         deserializeButton.setOnClickListener(v -> deserialize());
-//        shouldIndent.setOnCheckedChangeListener((compoundButton, checked) ->
-//                SimpleXmlParams.get().indentOutput(checked));
 
         SimpleXmlParams.get().setDebugMode(true);
         // Replace the default logger (Which is the logcat) so we can show the logs
@@ -131,6 +126,12 @@ public class TestActivity extends AppCompatActivity {
     }
 
     @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        menu.findItem(R.id.menu_indent_output).setChecked(shouldIndent);
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_clear_output:
@@ -138,6 +139,10 @@ public class TestActivity extends AppCompatActivity {
                 return true;
             case R.id.menu_show_log:
                 showLogs();
+                return true;
+            case R.id.menu_indent_output:
+                shouldIndent = !shouldIndent;
+                item.setChecked(shouldIndent);
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -147,6 +152,7 @@ public class TestActivity extends AppCompatActivity {
         logOutput = new StringBuilder();
 
         XmlSerializer serializer = new XmlSerializer();
+        serializer.setIndentOutput(shouldIndent);
         String output;
         try {
             output = serializer.serialize(objectToSerialize);
