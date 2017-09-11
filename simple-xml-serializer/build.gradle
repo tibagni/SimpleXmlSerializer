@@ -13,7 +13,7 @@ ext {
     siteUrl = 'https://github.com/tibagni/SimpleXmlSerializer'
     gitUrl = 'https://github.com/tibagni/SimpleXmlSerializer.git'
 
-    libraryVersion = '0.1.2'
+    libraryVersion = '1.0.0'
 
     developerId = 'tibagni'
     developerName = 'Tiago Viscardi Bagni'
@@ -32,8 +32,8 @@ android {
     defaultConfig {
         minSdkVersion 19
         targetSdkVersion 25
-        versionCode 2
-        versionName "0.1.2"
+        versionCode 3
+        versionName "1.0.0"
     }
     buildTypes {
         release {
