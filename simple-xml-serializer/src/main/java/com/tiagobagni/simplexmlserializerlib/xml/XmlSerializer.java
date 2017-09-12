@@ -10,9 +10,7 @@ import com.tiagobagni.simplexmlserializerlib.xml.annotation.XmlObjects;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * Utility class responsible for serializing an object annotated with
@@ -35,11 +33,22 @@ public class XmlSerializer {
     private XmlSerializer nestedSerializer;
 
     private final boolean DBG;
+    private boolean indentOutput;
     private final XmlSerializerLogger LOGGER;
 
     public XmlSerializer() {
-        DBG = SimpleXmlParams.get().isDebugMode();
-        LOGGER = SimpleXmlParams.get().getLogger();
+        SimpleXmlParams params = SimpleXmlParams.get();
+        DBG = params.isDebugMode();
+        LOGGER = params.getLogger();
+        indentOutput = true;
+    }
+
+    /**
+     * Enable/Disable indentation for output xml (enabled by default)
+     * @param indentOutput
+     */
+    public void setIndentOutput(boolean indentOutput) {
+        this.indentOutput = indentOutput;
     }
 
     /**
@@ -60,7 +69,7 @@ public class XmlSerializer {
     private void initializeFor(Object xmlObject) {
         ensureValid(xmlObject);
         this.xmlObject = xmlObject;
-        this.xmlRootTag = xmlObject.getClass().getSimpleName();
+        this.xmlRootTag = ReflectionUtils.getClassTag(xmlObject);
         this.xmlBuilder = new StringBuilder();
         this.nestedSerializer = null;
     }
@@ -77,8 +86,8 @@ public class XmlSerializer {
     }
 
     private void writeXmlHeader() {
-        xmlBuilder.append(XML_HEADER);
-        xmlBuilder.append(NEW_LINE);
+        content(XML_HEADER);
+        newLine();
 
         if (DBG) LOGGER.debug("writing xml header");
     }
@@ -104,31 +113,33 @@ public class XmlSerializer {
 
     private void writeOpenTag() {
         if (DBG) LOGGER.debug("writing open tag: " + xmlRootTag);
-        xmlBuilder.append(spacing);
-        xmlBuilder.append(open(xmlRootTag));
-        xmlBuilder.append(NEW_LINE);
+        indent(spacing);
+        open(xmlRootTag);
+        newLine();
     }
 
     private void writeFields() throws IllegalAccessException {
         Field[] fields = getOrderedFields();
         for (Field field : fields) {
             Annotation annotation = ReflectionUtils.getFieldAnnotation(field);
+            if (annotation == null) continue;
             field.setAccessible(true);
             Object value = field.get(xmlObject);
 
+            String tag = ReflectionUtils.getFieldTag(field, annotation);
             if (annotation instanceof XmlField) {
-                writeXmlField(((XmlField) annotation).value(), value);
+                writeXmlField(tag, value);
             } else if (annotation instanceof XmlObject) {
-                writeXmlObject(((XmlObject) annotation).value(), value);
+                writeXmlObject(tag, value);
             } else if (annotation instanceof XmlObjectList) {
-                writeXmlList(((XmlObjectList) annotation).value(), (List) value);
+                writeXmlList(tag, (List) value);
             } else if (annotation instanceof XmlObjects) {
-                writeMultipleItems(((XmlObjects) annotation).value(), (List) value);
+                writeMultipleItems(tag, (List) value);
             } else {
                 // Do not append a new line if no xml was written on this iteration
                 continue;
             }
-            xmlBuilder.append(NEW_LINE);
+            newLine();
         }
     }
 
@@ -149,16 +160,23 @@ public class XmlSerializer {
 
     private void writeXmlField(String tag, Object value) {
         if (DBG) LOGGER.debug("writing primitive: " + tag + " = " + value);
-        xmlBuilder.append(nestedSpacing);
-        xmlBuilder.append(open(tag));
-        xmlBuilder.append(value);
-        xmlBuilder.append(close(tag));
+        indent(nestedSpacing);
+        open(tag);
+        content(value == null ? "" : value);
+        close(tag);
     }
 
     private void writeXmlObject(String tag, Object value) throws IllegalAccessException {
         if (DBG) LOGGER.debug("writing object: " + tag + " = " + value);
+
+        if (value == null) {
+            if (DBG) LOGGER.debug("Skip object because it is null");
+            return;
+        }
+
         if (nestedSerializer == null) {
             nestedSerializer = new XmlSerializer();
+            nestedSerializer.setIndentOutput(indentOutput);
         }
 
         nestedSerializer.initializeFor(value);
@@ -169,9 +187,15 @@ public class XmlSerializer {
 
     private void writeXmlList(String tag, List items) throws IllegalAccessException {
         if (DBG) LOGGER.debug("writing list: " + tag);
-        xmlBuilder.append(nestedSpacing);
-        xmlBuilder.append(open(tag));
-        xmlBuilder.append(NEW_LINE);
+
+        if (items == null) {
+            if (DBG) LOGGER.debug("Skip list because it is null");
+            return;
+        }
+
+        indent(nestedSpacing);
+        open(tag);
+        newLine();
 
         Class itemType = (items != null && items.size() > 0) ? items.get(0).getClass() : null;
         String itemTag = itemType != null ? itemType.getSimpleName() : "";
@@ -180,30 +204,39 @@ public class XmlSerializer {
         writeMultipleItems(itemTag, items);
         indentLevels--; // After the list was written, restore indentation
 
-        xmlBuilder.append(nestedSpacing);
-        xmlBuilder.append(close(tag));
+        indent(nestedSpacing);
+        close(tag);
     }
 
     private void writeMultipleItems(String tag, List items) throws IllegalAccessException {
+        if (items == null) {
+            if (DBG) LOGGER.debug("Skip multiple objects because it is null");
+            return;
+        }
+
         for (Object item : items) {
             // For objects in a List, use the class name as tag
             writeXmlObject(tag, item);
-            xmlBuilder.append(NEW_LINE);
+            newLine();
         }
     }
 
     private void writeCloseTag() {
         if (DBG) LOGGER.debug("writing close tag: " + xmlRootTag);
-        xmlBuilder.append(spacing);
-        xmlBuilder.append(close(xmlRootTag));
+        indent(spacing);
+        close(xmlRootTag);
     }
 
-    private String open(String tag) {
-        return "<" + tag + ">";
+    private void open(String tag) {
+        xmlBuilder.append("<" + tag + ">");
     }
 
-    private String close(String tag) {
-        return "</" + tag + ">";
+    private void close(String tag) {
+        xmlBuilder.append("</" + tag + ">");
+    }
+
+    private void content(Object value) {
+        xmlBuilder.append(value);
     }
 
     private String getSpaces(int indentLevels) {
@@ -212,5 +245,17 @@ public class XmlSerializer {
             sb.append(INDENTATION);
         }
         return sb.toString();
+    }
+
+    private void newLine() {
+        if (indentOutput) {
+            xmlBuilder.append(NEW_LINE);
+        }
+    }
+
+    private void indent(String spacing) {
+        if (indentOutput) {
+            xmlBuilder.append(spacing);
+        }
     }
 }

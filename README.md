@@ -4,7 +4,7 @@ A simple Android tool to help create XML from Java objects and also read XML Str
 Add the dependency in Gradle:
 ```gradle
 dependencies {
-    compile 'com.github.tibagni:simple-xml-serializer:0.1.2'
+    compile 'com.github.tibagni:simple-xml-serializer:1.0.0'
 }
 ```
 Package is available in *jcenter*
