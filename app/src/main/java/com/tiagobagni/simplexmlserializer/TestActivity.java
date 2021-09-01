@@ -3,7 +3,7 @@ package com.tiagobagni.simplexmlserializer;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Menu;
@@ -21,6 +21,7 @@ import com.tiagobagni.simplexmlserializer.sampleobjects.Product;
 import com.tiagobagni.simplexmlserializer.sampleobjects.Rss;
 import com.tiagobagni.simplexmlserializer.sampleobjects.ShoppingCart;
 import com.tiagobagni.simplexmlserializer.sampleobjects.ShoppingCartItem;
+import com.tiagobagni.simplexmlserializer.sampleobjects.SimpleResponseObject;
 import com.tiagobagni.simplexmlserializerlib.XmlSerializerLogger;
 import com.tiagobagni.simplexmlserializerlib.xml.SimpleXmlParams;
 import com.tiagobagni.simplexmlserializerlib.xml.XmlDeserializer;
@@ -81,7 +82,7 @@ public class TestActivity extends AppCompatActivity {
         SimpleXmlParams.get().setLogger(new XmlSerializerLogger() {
             @Override
             public void debug(String logMessage) {
-                logOutput.append("> " + logMessage);
+                logOutput.append("> ").append(logMessage);
                 logOutput.append("\n");
                 logOutput.append("_______________________________________________________________");
                 logOutput.append("\n");
@@ -90,7 +91,7 @@ public class TestActivity extends AppCompatActivity {
 
             @Override
             public void error(String errorMsg) {
-                logOutput.append("> error: " + errorMsg);
+                logOutput.append("> error: ").append(errorMsg);
                 logOutput.append("\n");
                 logOutput.append("_______________________________________________________________");
                 logOutput.append("\n");
@@ -99,7 +100,7 @@ public class TestActivity extends AppCompatActivity {
 
             @Override
             public void error(String errorMsg, Throwable error) {
-                logOutput.append("> error: " + errorMsg + " - " + error);
+                logOutput.append("> error: ").append(errorMsg).append(" - ").append(error);
                 logOutput.append("\n");
                 logOutput.append("_______________________________________________________________");
                 logOutput.append("\n");
@@ -194,11 +195,11 @@ public class TestActivity extends AppCompatActivity {
     }
 
     private List<SpinnerItem> getObjectsToSerialize() {
-        return Arrays.asList(new SpinnerItem[] {
+        return Arrays.asList(
                 new SpinnerItem(getShoppingCart()),
-                new SpinnerItem(getRss())
-
-        });
+                new SpinnerItem(getRss()),
+                new SpinnerItem(getResponseObject())
+        );
     }
 
     private static class SpinnerItem {
@@ -269,6 +270,12 @@ public class TestActivity extends AppCompatActivity {
         channel.feed.add(feed2);
         rss.channel = channel;
         return rss;
+    }
+
+    private SimpleResponseObject getResponseObject() {
+        SimpleResponseObject response = new SimpleResponseObject();
+        response.response = "Ok";
+        return response;
     }
 
 }

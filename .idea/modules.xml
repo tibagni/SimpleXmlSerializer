@@ -2,9 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/SimpleXmlSerializer.iml" filepath="$PROJECT_DIR$/SimpleXmlSerializer.iml" />
-      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/simple-xml-serializer/simple-xml-serializer.iml" filepath="$PROJECT_DIR$/simple-xml-serializer/simple-xml-serializer.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/SimpleXmlSerializer.iml" filepath="$PROJECT_DIR$/.idea/SimpleXmlSerializer.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/SimpleXmlSerializer.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/SimpleXmlSerializer.app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/simple-xml-serializer/SimpleXmlSerializer.simple-xml-serializer.iml" filepath="$PROJECT_DIR$/.idea/modules/simple-xml-serializer/SimpleXmlSerializer.simple-xml-serializer.iml" />
     </modules>
   </component>
 </project>

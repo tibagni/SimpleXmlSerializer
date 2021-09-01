@@ -1,6 +1,6 @@
 package com.tiagobagni.simplexmlserializer;
 
-import android.support.test.runner.AndroidJUnit4;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import com.tiagobagni.simplexmlserializer.sampleobjects.testing.NestedXmlObject;
 import com.tiagobagni.simplexmlserializer.sampleobjects.testing.SimpleListXmlObject;
@@ -319,6 +319,19 @@ public class DeserializerTests {
                 "<?xml version=\"1.0\"?><simple>" +
                         "<boolean>True</boolean>" +
                         "</simple>");
+
+        SimpleXmlObject expected = new SimpleXmlObject();
+        expected.booleanVal = true;
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void test_simpleXmlObjectNoSimpleTag() throws XmlDeserializationException {
+        XmlDeserializer deserializer = new XmlDeserializer(SimpleXmlObject.class);
+        SimpleXmlObject actual = (SimpleXmlObject) deserializer.deserialize(
+                "<?xml version=\"1.0\"?>" +
+                        "<boolean>True</boolean>");
 
         SimpleXmlObject expected = new SimpleXmlObject();
         expected.booleanVal = true;
